@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Booking and Test Drive Service API
   version: 1.0.0
-  description: API for handling vehicle bookings and test drive appointments
+  description: API for handling vehicle bookings and test drive appointment
 servers:
   - url: http://localhost:8003
 tags:

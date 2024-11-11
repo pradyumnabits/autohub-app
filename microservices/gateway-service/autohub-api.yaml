@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Autohub API Gateway
-  description: API Gateway for Autohub Services
+  description: API Gateway for Autohub Services 
   version: 1.0.0
 servers:
   - url: http://localhost:8000  # Base URL for the gateway

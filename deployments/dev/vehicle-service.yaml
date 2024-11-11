@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: vehicle-svc
-        image: vehicle-svc:latest  # Using the locally built image
+        image: pradyumnakmbits/vehicle-svc:latest
         imagePullPolicy: Never
         ports:
         - containerPort: 8002
@@ -33,3 +33,4 @@ spec:
       targetPort: 8002
       nodePort: 30083
   type: NodePort
+# Updated at Mon Nov 11 12:03:55 UTC 2024

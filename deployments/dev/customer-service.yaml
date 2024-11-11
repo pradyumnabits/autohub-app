@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: customer-svc
-        image: customer-svc:latest  # Using the locally built image
+        image: pradyumnakmbits/customer-svc:latest
         imagePullPolicy: Never
         ports:
         - containerPort: 8007
@@ -33,3 +33,4 @@ spec:
       targetPort: 8007
       nodePort: 30082
   type: NodePort
+# Updated at Mon Nov 11 12:00:58 UTC 2024

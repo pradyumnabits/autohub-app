@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: rsa-svc
-        image: rsa-svc:latest  # Ensure this image is available locally or update to the correct image
+        image: pradyumnakmbits/rsa-svc:latest
         imagePullPolicy: Never
         ports:
         - containerPort: 8005
@@ -33,3 +33,4 @@ spec:
       targetPort: 8005  # Updated to match the container port in booking-svc
       nodePort: 30086   # Updated nodePort for booking-svc
   type: NodePort
+# Updated at Mon Nov 11 12:14:43 UTC 2024

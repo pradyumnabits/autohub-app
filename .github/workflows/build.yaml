@@ -58,7 +58,7 @@ jobs:
         run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/gateway-svc:latest
 
       - name: Tag Docker image
-        run: docker tag ${{ secrets.DOCKER_USERNAME }}/autohub/gateway-svc:latest ${{ secrets.DOCKER_USERNAME }}/gateway-svc:latest
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/gateway-svc:latest ${{ secrets.DOCKER_USERNAME }}/gateway-svc:latest
 
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/gateway-svc:latest

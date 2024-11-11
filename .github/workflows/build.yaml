@@ -163,7 +163,7 @@ jobs:
         run: docker tag ${{ secrets.DOCKER_USERNAME }}/autohub/customer-svc:latest ${{ secrets.DOCKER_USERNAME }}/customer-svc:latest
 
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/autohub:latest
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/customer-svc:latest
 
       - name: Update Kubernetes manifest
         run: |

@@ -1,25 +1,25 @@
-# autochoice-app
+# AutoHub Application
 
 # Test Local
 
 # start customer-service
-cd latest/customer-service
+cd microservices/customer-service
 sh ./start.sh
 
 #  start api-gateway
-cd latest/api-gateway
+cd microservices/api-gateway
 sh ./start.sh
 
-cd latest/customer-service
+cd microservices/customer-service
 python test.py
 
-cd latest/api-gateway/test
+cd microservices/api-gateway/test
 python customer-service-test.py
 
 
 #minikube k8s testing
 #Create images
-cd latest/customer-service
+cd microservices/customer-service
 sh ./build.sh
 cd latest/api-gateway
 sh ./build.sh

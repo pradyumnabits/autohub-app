@@ -67,7 +67,7 @@ jobs:
         run: |
           sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest"'|' microservices/deployments/dev/gateway-service.yaml
 
-          echo "# Updated at $(date)" >> microservices/deployments/dev/gateway-service.yaml
+          echo "# Updated at $(date)" >> deployments/dev/gateway-service.yaml
 
       - name: Commit and push updated manifest
         run: |
@@ -116,9 +116,9 @@ jobs:
 
       - name: Update Kubernetes manifest
         run: |
-          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest"'|' microservices/deployments/dev/auth-service.yaml
+          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest"'|' deployments/dev/auth-service.yaml
          
-          echo "# Updated at $(date)" >> microservices/deployments/dev/auth-service.yaml
+          echo "# Updated at $(date)" >> deployments/dev/auth-service.yaml
 
       - name: Commit and push updated manifest
         run: |
@@ -167,9 +167,9 @@ jobs:
 
       - name: Update Kubernetes manifest
         run: |
-          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest"'|' microservices/deployments/dev/customer-service.yaml
+          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest"'|' deployments/dev/customer-service.yaml
 
-          echo "# Updated at $(date)" >> microservices/deployments/dev/customer-service.yaml
+          echo "# Updated at $(date)" >> deployments/dev/customer-service.yaml
 
       - name: Commit and push updated manifest
         run: |
@@ -218,9 +218,9 @@ jobs:
 
       - name: Update Kubernetes manifest
         run: |
-          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest"'|' microservices/deployments/dev/vehicle-service.yaml
+          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest"'|' deployments/dev/vehicle-service.yaml
 
-          echo "# Updated at $(date)" >> microservices/deployments/dev/vehicle-service.yaml
+          echo "# Updated at $(date)" >> deployments/dev/vehicle-service.yaml
 
       - name: Commit and push updated manifest
         run: |
@@ -269,9 +269,9 @@ jobs:
 
       - name: Update Kubernetes manifest
         run: |
-          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest"'|' microservices/deployments/dev/booking-service.yaml
+          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest"'|' deployments/dev/booking-service.yaml
 
-          echo "# Updated at $(date)" >> microservices/deployments/dev/booking-service.yaml
+          echo "# Updated at $(date)" >> deployments/dev/booking-service.yaml
 
       - name: Commit and push updated manifest
         run: |
@@ -320,9 +320,9 @@ jobs:
 
       - name: Update Kubernetes manifest
         run: |
-          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest"'|' microservices/deployments/dev/support-service.yaml
+          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest"'|' deployments/dev/support-service.yaml
 
-          echo "# Updated at $(date)" >> microservices/deployments/dev/support-service.yaml
+          echo "# Updated at $(date)" >> deployments/dev/support-service.yaml
 
       - name: Commit and push updated manifest
         run: |
@@ -371,9 +371,9 @@ jobs:
 
       - name: Update Kubernetes manifest
         run: |
-          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest"'|' microservices/deployments/dev/rsa-service.yaml
+          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest"'|' deployments/dev/rsa-service.yaml
 
-          echo "# Updated at $(date)" >> microservices/deployments/dev/rsa-service.yaml
+          echo "# Updated at $(date)" >> deployments/dev/rsa-service.yaml
 
       - name: Commit and push updated manifest
         run: |
@@ -422,9 +422,9 @@ jobs:
 
       - name: Update Kubernetes manifest
         run: |
-          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest"'|' microservices/deployments/dev/feedback-service.yaml
+          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest"'|' deployments/dev/feedback-service.yaml
 
-          echo "# Updated at $(date)" >> microservices/deployments/dev/feedback-service.yaml
+          echo "# Updated at $(date)" >> deployments/dev/feedback-service.yaml
 
       - name: Commit and push updated manifest
         run: |

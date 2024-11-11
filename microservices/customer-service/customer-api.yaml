@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   title: Customer API
-  description: API for managing customer data
+  description: API for managing customer data 
   version: 1.0.0
 
 paths:

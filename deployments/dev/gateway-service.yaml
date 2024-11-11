@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: gateway-svc
-        image: gateway-svc:latest  # Using the locally built image
+        image: pradyumnakmbits/gateway-svc:latest
         imagePullPolicy: Never
         ports:
         - containerPort: 8000
@@ -33,3 +33,4 @@ spec:
       targetPort: 8000
       nodePort: 30081
   type: NodePort
+# Updated at Mon Nov 11 12:28:44 UTC 2024

@@ -65,7 +65,7 @@ jobs:
 
       - name: Update Kubernetes manifest
         run: |
-          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/gateway-svc:latest"'|' microservices/deployments/dev/gateway-service.yaml
+          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/gateway-svc:latest"'|' deployments/dev/gateway-service.yaml
 
           echo "# Updated at $(date)" >> deployments/dev/gateway-service.yaml
 
@@ -73,7 +73,7 @@ jobs:
         run: |
           git config --local user.name "github-actions"
           git config --local user.email "github-actions@github.com"
-          git add microservices/deployments/dev/gateway-service.yaml
+          git add deployments/dev/gateway-service.yaml
           git commit -m "Update gateway-service image to latest version"
           git push
         env:
@@ -124,7 +124,7 @@ jobs:
         run: |
           git config --local user.name "github-actions"
           git config --local user.email "github-actions@github.com"
-          git add microservices/deployments/dev/auth-service.yaml
+          git add deployments/dev/auth-service.yaml
           git commit -m "Update auth-service image to latest version"
           git push
         env:
@@ -175,7 +175,7 @@ jobs:
         run: |
           git config --local user.name "github-actions"
           git config --local user.email "github-actions@github.com"
-          git add microservices/deployments/dev/customer-service.yaml
+          git add deployments/dev/customer-service.yaml
           git commit -m "Update customer-service image to latest version"
           git push
         env:
@@ -226,7 +226,7 @@ jobs:
         run: |
           git config --local user.name "github-actions"
           git config --local user.email "github-actions@github.com"
-          git add microservices/deployments/dev/vehicle-service.yaml
+          git add deployments/dev/vehicle-service.yaml
           git commit -m "Update vehicle-service image to latest version"
           git push
         env:
@@ -277,7 +277,7 @@ jobs:
         run: |
           git config --local user.name "github-actions"
           git config --local user.email "github-actions@github.com"
-          git add microservices/deployments/dev/booking-service.yaml
+          git add deployments/dev/booking-service.yaml
           git commit -m "Update booking-service image to latest version"
           git push
         env:
@@ -328,7 +328,7 @@ jobs:
         run: |
           git config --local user.name "github-actions"
           git config --local user.email "github-actions@github.com"
-          git add microservices/deployments/dev/support-service.yaml
+          git add deployments/dev/support-service.yaml
           git commit -m "Update support-service image to latest version"
           git push
         env:
@@ -379,7 +379,7 @@ jobs:
         run: |
           git config --local user.name "github-actions"
           git config --local user.email "github-actions@github.com"
-          git add microservices/deployments/dev/rsa-service.yaml
+          git add deployments/dev/rsa-service.yaml
           git commit -m "Update rsa-service image to latest version"
           git push
         env:
@@ -430,7 +430,7 @@ jobs:
         run: |
           git config --local user.name "github-actions"
           git config --local user.email "github-actions@github.com"
-          git add microservices/deployments/dev/feedback-service.yaml
+          git add deployments/dev/feedback-service.yaml
           git commit -m "Update feedback-service image to latest version"
           git push
         env:

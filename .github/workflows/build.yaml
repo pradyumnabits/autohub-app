@@ -367,7 +367,7 @@ jobs:
         run: docker tag ${{ secrets.DOCKER_USERNAME }}/autohub/rsa-svc:latest ${{ secrets.DOCKER_USERNAME }}/rsa-svc:latest
 
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/rsa:latest
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/rsa-svc:latest
 
       - name: Update Kubernetes manifest
         run: |

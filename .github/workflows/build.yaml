@@ -58,14 +58,14 @@ jobs:
         run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/gateway-svc:latest
 
       - name: Tag Docker image
-        run: docker tag ${{ secrets.DOCKER_USERNAME }}/autochoice/gateway-svc:latest ${{ secrets.DOCKER_USERNAME }}/gateway-svc:latest
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/autohub/gateway-svc:latest ${{ secrets.DOCKER_USERNAME }}/gateway-svc:latest
 
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/gateway-svc:latest
 
       - name: Update Kubernetes manifest
         run: |
-          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest"'|' microservices/deployments/dev/gateway-service.yaml
+          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/gateway-svc:latest"'|' microservices/deployments/dev/gateway-service.yaml
 
           echo "# Updated at $(date)" >> deployments/dev/gateway-service.yaml
 
@@ -106,17 +106,17 @@ jobs:
 
       - name: Build Docker image
         working-directory: microservices/auth-service
-        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest
+        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/auth-svc:latest
 
       - name: Tag Docker image
-        run: docker tag ${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest ${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/auth-svc:latest ${{ secrets.DOCKER_USERNAME }}/auth-svc:latest
 
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/auth-svc:latest
 
       - name: Update Kubernetes manifest
         run: |
-          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest"'|' deployments/dev/auth-service.yaml
+          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/auth-svc:latest"'|' deployments/dev/auth-service.yaml
          
           echo "# Updated at $(date)" >> deployments/dev/auth-service.yaml
 
@@ -157,17 +157,17 @@ jobs:
 
       - name: Build Docker image
         working-directory: microservices/customer-service
-        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/autochoice/customer-svc:latest
+        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/autohub/customer-svc:latest
 
       - name: Tag Docker image
-        run: docker tag ${{ secrets.DOCKER_USERNAME }}/autochoice/customer-svc:latest ${{ secrets.DOCKER_USERNAME }}/customer-svc:latest
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/autohub/customer-svc:latest ${{ secrets.DOCKER_USERNAME }}/customer-svc:latest
 
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/autochoice:latest
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/autohub:latest
 
       - name: Update Kubernetes manifest
         run: |
-          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest"'|' deployments/dev/customer-service.yaml
+          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/customer-svc:latest"'|' deployments/dev/customer-service.yaml
 
           echo "# Updated at $(date)" >> deployments/dev/customer-service.yaml
 
@@ -208,17 +208,17 @@ jobs:
 
       - name: Build Docker image
         working-directory: microservices/vehicle-service
-        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/autochoice/vehicle-svc:latest
+        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/autohub/vehicle-svc:latest
 
       - name: Tag Docker image
-        run: docker tag ${{ secrets.DOCKER_USERNAME }}/autochoice/vehicle-svc:latest ${{ secrets.DOCKER_USERNAME }}/vehicle-svc:latest
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/autohub/vehicle-svc:latest ${{ secrets.DOCKER_USERNAME }}/vehicle-svc:latest
 
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/vehicle-svc:latest
 
       - name: Update Kubernetes manifest
         run: |
-          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest"'|' deployments/dev/vehicle-service.yaml
+          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/vehicle-svc:latest"'|' deployments/dev/vehicle-service.yaml
 
           echo "# Updated at $(date)" >> deployments/dev/vehicle-service.yaml
 
@@ -259,17 +259,17 @@ jobs:
 
       - name: Build Docker image
         working-directory: microservices/booking-service
-        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/autochoice/booking-svc:latest
+        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/autohub/booking-svc:latest
 
       - name: Tag Docker image
-        run: docker tag ${{ secrets.DOCKER_USERNAME }}/autochoice/booking-svc:latest ${{ secrets.DOCKER_USERNAME }}/booking-svc:latest
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/autohub/booking-svc:latest ${{ secrets.DOCKER_USERNAME }}/booking-svc:latest
 
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/booking-svc:latest
 
       - name: Update Kubernetes manifest
         run: |
-          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest"'|' deployments/dev/booking-service.yaml
+          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/booking-svc:latest"'|' deployments/dev/booking-service.yaml
 
           echo "# Updated at $(date)" >> deployments/dev/booking-service.yaml
 
@@ -310,17 +310,17 @@ jobs:
 
       - name: Build Docker image
         working-directory: microservices/support-service
-        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/autochoice/support-svc:latest
+        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/autohub/support-svc:latest
 
       - name: Tag Docker image
-        run: docker tag ${{ secrets.DOCKER_USERNAME }}/autochoice/support-svc:latest ${{ secrets.DOCKER_USERNAME }}/support-svc:latest
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/autohub/support-svc:latest ${{ secrets.DOCKER_USERNAME }}/support-svc:latest
 
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/support-svc:latest
 
       - name: Update Kubernetes manifest
         run: |
-          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest"'|' deployments/dev/support-service.yaml
+          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/support-svc:latest"'|' deployments/dev/support-service.yaml
 
           echo "# Updated at $(date)" >> deployments/dev/support-service.yaml
 
@@ -361,17 +361,17 @@ jobs:
 
       - name: Build Docker image
         working-directory: microservices/rsa-service
-        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/autochoice/rsa-svc:latest
+        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/autohub/rsa-svc:latest
 
       - name: Tag Docker image
-        run: docker tag ${{ secrets.DOCKER_USERNAME }}/autochoice/rsa-svc:latest ${{ secrets.DOCKER_USERNAME }}/rsa-svc:latest
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/autohub/rsa-svc:latest ${{ secrets.DOCKER_USERNAME }}/rsa-svc:latest
 
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/rsa:latest
 
       - name: Update Kubernetes manifest
         run: |
-          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest"'|' deployments/dev/rsa-service.yaml
+          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/rsa-svc:latest"'|' deployments/dev/rsa-service.yaml
 
           echo "# Updated at $(date)" >> deployments/dev/rsa-service.yaml
 
@@ -412,17 +412,17 @@ jobs:
 
       - name: Build Docker image
         working-directory: microservices/feedback-service
-        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/autochoice/feedback-svc:latest
+        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/autohub/feedback-svc:latest
 
       - name: Tag Docker image
-        run: docker tag ${{ secrets.DOCKER_USERNAME }}/autochoice/feedback-svc:latest ${{ secrets.DOCKER_USERNAME }}/feedback-svc:latest
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/autohub/feedback-svc:latest ${{ secrets.DOCKER_USERNAME }}/feedback-svc:latest
 
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/feedback-svc:latest
 
       - name: Update Kubernetes manifest
         run: |
-          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/ah-auth-svc:latest"'|' deployments/dev/feedback-service.yaml
+          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/feedback-svc:latest"'|' deployments/dev/feedback-service.yaml
 
           echo "# Updated at $(date)" >> deployments/dev/feedback-service.yaml
 

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: feedback-svc
-        image: feedback-svc:latest  # Using the locally built image
+        image: pradyumnakmbits/feedback-svc:latest
         imagePullPolicy: Never
         ports:
         - containerPort: 8006
@@ -33,3 +33,4 @@ spec:
       targetPort: 8006
       nodePort: 30087
   type: NodePort
+# Updated at Mon Nov 11 12:16:36 UTC 2024

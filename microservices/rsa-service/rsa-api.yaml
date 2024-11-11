@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Roadside Assistance Service API
   version: 1.0.0
-  description: API for handling emergency roadside assistance requests and tracking 
+  description: API for handling emergency roadside assistance requests and tracking
 servers:
   - url: http://localhost:8005
 paths:

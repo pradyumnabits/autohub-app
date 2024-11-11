@@ -1,0 +1,345 @@
+openapi: 3.0.0
+info:
+  title: Autohub API Gateway
+  description: API Gateway for Autohub Services
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000  # Base URL for the gateway
+tags:
+  - name: Authentication
+    description: Endpoints related to user authentication and registration
+  - name: Customers
+    description: Endpoints for managing customer data
+  - name: Vehicles
+    description: Endpoints for managing vehicle data
+  - name: Test Drives
+    description: Endpoints related to test drive bookings
+  - name: Post Sale Services
+    description: Endpoints for post-sale service requests
+  - name: Roadside Assistance
+    description: Endpoints for roadside assistance requests
+  - name: Customer Feedback
+    description: Endpoints for submitting and retrieving customer feedback
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                email:
+                  type: string
+      responses:
+        '200':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    type: object
+
+  /auth/token:
+    post:
+      tags:
+        - Authentication
+      summary: Login for access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Access token generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  token_type:
+                    type: string
+
+  /customers:
+    get:
+      tags:
+        - Customers
+      summary: Retrieve all customers
+      responses:
+        '200':
+          description: List of customers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+    post:
+      tags:
+        - Customers
+      summary: Create a new customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+      responses:
+        '200':
+          description: Customer created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  customer:
+                    type: object
+
+  /vehicles:
+    get:
+      tags:
+        - Vehicles
+      summary: Retrieve vehicles
+      parameters:
+        - in: query
+          name: make
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: model
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: year
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of vehicles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+    post:
+      tags:
+        - Vehicles
+      summary: Create a new vehicle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                make:
+                  type: string
+                model:
+                  type: string
+                year:
+                  type: integer
+      responses:
+        '200':
+          description: Vehicle created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  vehicle:
+                    type: object
+
+  /vehicles/{vehicle_id}:
+    get:
+      tags:
+        - Vehicles
+      summary: Retrieve a vehicle by ID
+      parameters:
+        - in: path
+          name: vehicle_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Vehicle details
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /testdrives:
+    get:
+      tags:
+        - Test Drives
+      summary: Retrieve test drives
+      parameters:
+        - in: query
+          name: vehicle_id
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of test drives
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+  /service/schedule:
+    post:
+      tags:
+        - Post Sale Services
+      summary: Schedule a service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                service_request:
+                  type: object
+      responses:
+        '200':
+          description: Service scheduled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /service/history:
+    get:
+      tags:
+        - Post Sale Services
+      summary: Retrieve service history
+      responses:
+        '200':
+          description: List of service history records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+  /rsa/request:
+    post:
+      tags:
+        - Roadside Assistance
+      summary: Request roadside assistance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                request:
+                  type: object
+      responses:
+        '200':
+          description: Roadside assistance requested
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /rsa/status/{requestId}:
+    get:
+      tags:
+        - Roadside Assistance
+      summary: Get status of roadside assistance request
+      parameters:
+        - in: path
+          name: requestId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Roadside assistance request status
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /feedback/submit:
+    post:
+      tags:
+        - Customer Feedback
+      summary: Submit customer feedback
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                feedback:
+                  type: object
+      responses:
+        '200':
+          description: Feedback submitted
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /feedback/{id}:
+    get:
+      tags:
+        - Customer Feedback
+      summary: Retrieve feedback by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Feedback details
+          content:
+            application/json:
+              schema:
+                type: object

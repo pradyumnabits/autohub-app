@@ -1,0 +1,98 @@
+openapi: 3.0.3
+info:
+  title: Roadside Assistance Service API
+  version: 1.0.0
+  description: API for handling emergency roadside assistance requests and tracking
+servers:
+  - url: http://localhost:8005
+paths:
+  /rsa/request:
+    post:
+      summary: Request roadside assistance
+      operationId: requestRoadsideAssistance
+      tags:
+        - Roadside Assistance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoadsideAssistanceRequest'
+      responses:
+        '201':
+          description: Roadside assistance request successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoadsideRequest'
+        '400':
+          description: Invalid request
+  /rsa/status/{requestId}:
+    get:
+      summary: Get roadside assistance status by request ID
+      operationId: getRoadsideStatus
+      tags:
+        - Roadside Assistance
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the roadside assistance request
+      responses:
+        '200':
+          description: Details of the roadside assistance request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoadsideRequest'
+        '404':
+          description: Request not found
+components:
+  schemas:
+    RoadsideRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        user_id:
+          type: string
+          example: "5001"
+        vehicle_id:
+          type: string
+          example: "101"
+        location:
+          type: string
+          example: "123 Main St, City, Country"
+        status:
+          type: string
+          example: "Pending"
+        provider:
+          type: string
+          example: "AAA Roadside Services"
+    RoadsideAssistanceRequest:
+      type: object
+      required:
+        - user_id
+        - vehicle_id
+        - location
+      properties:
+        user_id:
+          type: string
+          example: "5001"
+        vehicle_id:
+          type: string
+          example: "101"
+        location:
+          type: string
+          example: "123 Main St, City, Country"
+          
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []

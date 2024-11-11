@@ -1,0 +1,101 @@
+openapi: 3.0.2
+info:
+  title: User Authentication API
+  version: 1.0.0
+  description: API for user registration and authentication with customer service integrations
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        200:
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        400:
+          description: Username already registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+
+  /auth/login:
+    post:
+      summary: Log in a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthUser'
+      responses:
+        200:
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  user:
+                    type: object
+                    properties:
+                      username:
+                        type: string
+                      email:
+                        type: string
+        400:
+          description: Invalid username or password
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        phoneNumber:
+          type: string
+        address:
+          type: string
+
+    AuthUser:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string

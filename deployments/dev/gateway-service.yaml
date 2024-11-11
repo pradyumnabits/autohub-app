@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-svc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway-svc
+  template:
+    metadata:
+      labels:
+        app: gateway-svc
+    spec:
+      containers:
+      - name: gateway-svc
+        image: gateway-svc:latest  # Using the locally built image
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-svc
+spec:
+  selector:
+    app: gateway-svc
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+      nodePort: 30081
+  type: NodePort

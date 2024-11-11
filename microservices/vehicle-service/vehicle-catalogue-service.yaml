@@ -1,0 +1,151 @@
+openapi: 3.0.3
+info:
+  title: Vehicle Management Service API
+  version: 1.0.0
+  description: API for managing vehicle searches, viewing details
+servers:
+  - url: http://localhost:8002
+tags:
+  - name: Vehicles
+
+paths:
+  /vehicles:
+    get:
+      tags:
+        - Vehicles
+      summary: Get a list of vehicles
+      operationId: getVehicles
+      parameters:
+        - name: make
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by vehicle make (e.g., Maruti, Tata, Hyundai)
+          example: "Maruti"
+        - name: model
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by vehicle model (e.g., Swift, Nexon, Creta)
+          example: "Swift"
+        - name: year
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Filter by vehicle year
+          example: 2023
+        - name: price_min
+          in: query
+          required: false
+          schema:
+            type: number
+            format: float
+          description: Filter by minimum vehicle price
+          example: 500000
+        - name: price_max
+          in: query
+          required: false
+          schema:
+            type: number
+            format: float
+          description: Filter by maximum vehicle price
+          example: 2000000
+        - name: fuel_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [Petrol, Diesel, Electric, Hybrid]
+          description: Filter by vehicle fuel type
+          example: "Petrol"
+        - name: transmission
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [Manual, Automatic]
+          description: Filter by vehicle transmission type
+          example: "Automatic"
+        - name: body_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [Hatchback, Sedan, SUV, MPV]
+          description: Filter by vehicle body type
+          example: "SUV"
+      responses:
+        '200':
+          description: List of vehicles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Vehicle'
+        '400':
+          description: Invalid request
+
+  /vehicles/{id}:
+    get:
+      tags:
+        - Vehicles
+      summary: Get details of a specific vehicle
+      operationId: getVehicleById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the vehicle
+          example: "1"
+      responses:
+        '200':
+          description: Details of the vehicle
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+        '404':
+          description: Vehicle not found
+
+components:
+  schemas:
+    Vehicle:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        make:
+          type: string
+          example: "Maruti"
+        model:
+          type: string
+          example: "Swift"
+        year:
+          type: integer
+          example: 2023
+        price:
+          type: number
+          format: float
+          example: 650000
+        fuel_type:
+          type: string
+          example: "Petrol"
+        transmission:
+          type: string
+          example: "Manual"
+        body_type:
+          type: string
+          example: "Hatchback"
+        image_url:
+          type: string
+          example: "https://example.com/vehicle/maruti-swift.jpg"
+
+
+

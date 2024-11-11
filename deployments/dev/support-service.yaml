@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: support-svc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: support-svc
+  template:
+    metadata:
+      labels:
+        app: support-svc
+    spec:
+      containers:
+      - name: support-svc
+        image: support-svc:latest  # Ensure this image is available locally or update to the correct image
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8004
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: support-svc
+spec:
+  selector:
+    app: support-svc
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8004  # Updated to match the container port in booking-svc
+      nodePort: 30085   # Updated nodePort for booking-svc
+  type: NodePort

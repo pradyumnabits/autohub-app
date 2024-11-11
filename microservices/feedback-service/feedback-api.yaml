@@ -1,0 +1,130 @@
+openapi: 3.0.3
+info:
+  title: Customer Feedback Service API
+  version: 1.0.0
+  description: API for collecting and managing customer feedback for vehicles and post-sale services
+servers:
+  - url: http://localhost:8006
+paths:
+  /feedback/submit:
+    post:
+      summary: Submit feedback for a vehicle or service
+      operationId: submitFeedback
+      tags:
+        - Customer Feedback
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeedbackRequest'
+      responses:
+        '201':
+          description: Feedback successfully submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeedbackResponse'
+        '400':
+          description: Invalid feedback submission request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /feedback/{id}:
+    get:
+      summary: Retrieve feedback submitted by a customer
+      operationId: getFeedbackById
+      tags:
+        - Customer Feedback
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the feedback
+      responses:
+        '200':
+          description: Feedback retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeedbackResponse'
+        '404':
+          description: Feedback not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    FeedbackRequest:
+      type: object
+      required:
+        - user_id
+        - feedback_type
+        - details
+        - rating
+      properties:
+        user_id:
+          type: string
+          example: "5001"
+        feedback_type:
+          type: string
+          enum: [vehicle, service, dealership]
+          example: vehicle
+        reference_id:
+          type: string
+          description: ID of the vehicle, service, or dealership the feedback is related to
+          example: "101"
+        details:
+          type: string
+          description: Detailed feedback provided by the customer
+          example: "The vehicle is excellent, but the service needs improvement."
+        rating:
+          type: integer
+          description: Rating out of 5
+          minimum: 1
+          maximum: 5
+          example: 4
+    FeedbackResponse:
+      type: object
+      properties:
+        feedback_id:
+          type: string
+          example: "1001"
+        user_id:
+          type: string
+          example: "5001"
+        feedback_type:
+          type: string
+          enum: [vehicle, service, dealership]
+          example: vehicle
+        reference_id:
+          type: string
+          example: "101"
+        details:
+          type: string
+          example: "The vehicle is excellent, but the service needs improvement."
+        rating:
+          type: integer
+          example: 4
+        submitted_at:
+          type: string
+          format: date-time
+          example: "2023-09-15T12:34:56Z"
+    ErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+          example: "Feedback not found"
+          
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []

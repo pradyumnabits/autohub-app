@@ -1,0 +1,126 @@
+openapi: 3.0.3
+info:
+  title: Post-Sale Service Support API
+  version: 1.0.0
+  description: API for handling vehicle post-sale support services.
+servers:
+  - url: http://localhost:8004
+paths:
+  /service/schedule:
+    post:
+      summary: Schedule a service appointment
+      operationId: scheduleService
+      tags:
+        - Support Service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceRequest'
+      responses:
+        '201':
+          description: Service appointment successfully scheduled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceAppointment'
+        '400':
+          description: Invalid request
+  /service/history:
+    get:
+      summary: Get vehicle service history
+      operationId: getServiceHistory
+      tags:
+        - Support Service
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The ID of the user
+        - name: vehicle_id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by vehicle ID (optional)
+      responses:
+        '200':
+          description: List of service history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceHistory'
+        '400':
+          description: Invalid request
+components:
+  schemas:
+    ServiceAppointment:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        user_id:
+          type: string
+          example: "5001"
+        vehicle_id:
+          type: string
+          example: "101"
+        appointment_date:
+          type: string
+          format: date
+          example: "2023-09-15"
+        service_type:
+          type: string
+          example: "Oil Change"
+        status:
+          type: string
+          example: "Scheduled"
+    ServiceRequest:
+      type: object
+      required:
+        - user_id
+        - vehicle_id
+        - appointment_date
+        - service_type
+      properties:
+        user_id:
+          type: string
+          example: "5001"
+        vehicle_id:
+          type: string
+          example: "101"
+        appointment_date:
+          type: string
+          format: date
+          example: "2023-09-15"
+        service_type:
+          type: string
+          example: "Oil Change"
+    ServiceHistory:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        user_id:
+          type: string
+          example: "5001"
+        vehicle_id:
+          type: string
+          example: "101"
+        service_date:
+          type: string
+          format: date
+          example: "2023-07-15"
+        service_type:
+          type: string
+          example: "Oil Change"
+        description:
+          type: string
+          example: "Regular oil change and inspection."

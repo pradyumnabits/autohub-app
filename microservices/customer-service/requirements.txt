@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+pydantic
+requests
+sqlalchemy
+psycopg2-binary
+prometheus-fastapi-instrumentator
+prometheus-client
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-instrumentation-fastapi
+opentelemetry-exporter-jaeger
+opentelemetry-instrumentation-requests
+

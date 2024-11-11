@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vehicle-svc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vehicle-svc
+  template:
+    metadata:
+      labels:
+        app: vehicle-svc
+    spec:
+      containers:
+      - name: vehicle-svc
+        image: vehicle-svc:latest  # Using the locally built image
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8002
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vehicle-svc
+spec:
+  selector:
+    app: vehicle-svc
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8002
+      nodePort: 30083
+  type: NodePort

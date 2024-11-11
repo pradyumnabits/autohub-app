@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rsa-svc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rsa-svc
+  template:
+    metadata:
+      labels:
+        app: rsa-svc
+    spec:
+      containers:
+      - name: rsa-svc
+        image: rsa-svc:latest  # Ensure this image is available locally or update to the correct image
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8005
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rsa-svc
+spec:
+  selector:
+    app: rsa-svc
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8005  # Updated to match the container port in booking-svc
+      nodePort: 30086   # Updated nodePort for booking-svc
+  type: NodePort

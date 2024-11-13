@@ -7,7 +7,6 @@ BASE_URL = "http://localhost:8000"
 fake = Faker()
 
 # Function to test user registration with random data
-# Function to test user registration with random data
 def test_register_user():
     userName = fake.user_name()
     password = fake.password()
@@ -28,10 +27,15 @@ def test_register_user():
         "address": address
     }
 
-    # Debugging output
-    print("Register Payload:", payload)
+    # Debugging output: print the request URL and payload
+    print("Register Request URL:", url)
+    print("Register Request Payload:", payload)
 
     response = requests.post(url, json=payload)
+
+    # Debugging output: print the response
+    print("Register Response Status Code:", response.status_code)
+    print("Register Response Text:", response.text)
 
     if response.status_code == 200:
         print("Register Test Passed:", response.json())
@@ -64,7 +68,10 @@ def test_login_user():
     }
 
     # Register the user
-    register_response = requests.post(f"{BASE_URL}/auth/register", json=register_payload)
+    register_url = f"{BASE_URL}/auth/register"
+    print("Register Request URL:", register_url)
+    print("Register Request Payload:", register_payload)
+    register_response = requests.post(register_url, json=register_payload)
 
     if register_response.status_code != 200:
         print("Registration failed:", register_response.json())
@@ -76,7 +83,15 @@ def test_login_user():
         "password": password
     }
 
-    response = requests.post(f"{BASE_URL}/auth/login", json=login_payload)
+    login_url = f"{BASE_URL}/auth/login"
+    print("Login Request URL:", login_url)
+    print("Login Request Payload:", login_payload)
+
+    response = requests.post(login_url, json=login_payload)
+
+    # Debugging output: print the response
+    print("Login Response Status Code:", response.status_code)
+    print("Login Response Text:", response.text)
 
     if response.status_code == 200:
         print("Login Test Passed:", response.json())

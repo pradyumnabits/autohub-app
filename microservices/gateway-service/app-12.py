@@ -4,18 +4,10 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter, SimpleSpanProcessor
 from opentelemetry.exporter.jaeger.thrift import JaegerExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.propagate import inject
 import httpx
 import logging
-from loguru import logger
-import time
-from prometheus_fastapi_instrumentator import Instrumentator
-from prometheus_client import Counter
-
-
-
 
 app = FastAPI()
 
@@ -42,7 +34,7 @@ CUSTOMER_SERVICE_URL = "http://localhost:8007"
 # ===========================
 def configure_opentelemetry():
     resource = Resource(attributes={
-        "service.name": "gateway-service",
+        "service.name": "fastapi-service",
         "service.version": "1.0.0"
     })
 
@@ -60,8 +52,7 @@ def configure_opentelemetry():
     trace.get_tracer_provider().add_span_processor(SimpleSpanProcessor(console_exporter))
 
 configure_opentelemetry()
-FastAPIInstrumentor.instrument_app(app)  # For FastAPI routes
-RequestsInstrumentor().instrument()      # For outgoing HTTP requests
+FastAPIInstrumentor.instrument_app(app)
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -71,9 +62,6 @@ import httpx
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
-
-
-
 
 
 async def forward_request(service_url: str, request: Request):
@@ -138,176 +126,37 @@ def ping():
     return {"msg": "pong-gateway-svc"}
 
 # Auth Service APIs
-from opentelemetry import trace
-from opentelemetry.propagate import inject
-
-# Get the tracer for the gateway service
-tracer = trace.get_tracer(__name__)
-
-from loguru import logger
-import time
-
-# Register endpoint
-from loguru import logger
-import time
-
-import time
-from loguru import logger
-from fastapi import HTTPException, Request
-
-# Initialize Prometheus instrumentation
-instrumentatorProm = Instrumentator()
-# Counter to track requests
-REQUEST_COUNT = Counter(
-    "http_requests_total", 
-    "Total number of HTTP requests", 
-    ["method", "endpoint", "http_status"]
-)
-instrumentatorProm.instrument(app).expose(app)
-
-
-
-# Register endpoint
+# Auth Service APIs
 @app.post("/auth/register")
 async def register_user(request: Request):
-    # Start a span for tracing
-    start_time = time.time()
-    
     try:
-        # Capture the incoming request data
         request_data = await request.json()
-        
-        # Inject trace context into the request headers (if tracing enabled)
-        headers = dict(request.headers)
-        inject(headers)
-        
-        # Define the URL for the authentication service
-        url = f"{AUTH_SERVICE_URL}/auth/register"
-        apiEndpoint = "/auth/register"
-        
-        # Forward the request to the authentication service
         async with httpx.AsyncClient() as client:
-            response = await client.post(url, json=request_data, headers=headers)
+            response = await client.post(f"{AUTH_SERVICE_URL}/auth/register", json=request_data)
             response.raise_for_status()  # Raises an error for 4xx/5xx responses
-        
-        # Log time taken, response status, and URL in milliseconds
-        duration_ms = (time.time() - start_time) * 1000  # Convert to milliseconds
-        logger.info(f"API: {apiEndpoint}, Duration: {duration_ms:.2f}ms, Response status: {response.status_code}, Request data: {request_data}, Response: {response.json()}")
-        
-        # Track the request in Prometheus
-        REQUEST_COUNT.labels(method="POST", endpoint=apiEndpoint, http_status=response.status_code).inc()
-        
-        # Return the response from the authentication service
         return response.json()
-    
     except httpx.HTTPStatusError as exc:
-        logger.error(f"HTTP error during registration: {exc.response.status_code} - {exc.response.text}")
+        logging.error(f"HTTP error during registration: {exc.response.status_code} - {exc.response.text}")
         raise HTTPException(status_code=exc.response.status_code, detail=str(exc))
-    
     except Exception as e:
-        logger.error(f"Error processing registration request: {str(e)}")
+        logging.error(f"Error processing registration request: {str(e)}")
         raise HTTPException(status_code=400, detail="Invalid input data")
 
-# Login endpoint
+
 @app.post("/auth/login")
 async def login_for_access_token(request: Request):
-    # Start a span for tracing
-    start_time = time.time()
-    
     try:
-        # Capture the incoming request data
         request_data = await request.json()
-        
-        # Inject trace context into the request headers (if tracing enabled)
-        headers = dict(request.headers)
-        inject(headers)
-        
-        # Define the URL for the authentication service
-        url = f"{AUTH_SERVICE_URL}/auth/login"
-        apiEndpoint = "/auth/login"
-        
-        # Forward the request to the authentication service
         async with httpx.AsyncClient() as client:
-            response = await client.post(url, json=request_data, headers=headers)
+            response = await client.post(f"{AUTH_SERVICE_URL}/login", json=request_data)
             response.raise_for_status()  # Raises an error for 4xx/5xx responses
-        
-        # Log time taken, response status, and URL in milliseconds
-        duration_ms = (time.time() - start_time) * 1000  # Convert to milliseconds
-        logger.info(f"API: {apiEndpoint}, Duration: {duration_ms:.2f}ms, Response status: {response.status_code}, Request data: {request_data}, Response: {response.json()}")
-        
-        # Track the request in Prometheus
-        REQUEST_COUNT.labels(method="POST", endpoint=apiEndpoint, http_status=response.status_code).inc()
-        
-        # Return the response from the authentication service
         return response.json()
-    
     except httpx.HTTPStatusError as exc:
-        logger.error(f"HTTP error during login: {exc.response.status_code} - {exc.response.text}")
+        logging.error(f"HTTP error during login: {exc.response.status_code} - {exc.response.text}")
         raise HTTPException(status_code=exc.response.status_code, detail=str(exc))
-    
     except Exception as e:
-        logger.error(f"Error processing login request: {str(e)}")
+        logging.error(f"Error processing login request: {str(e)}")
         raise HTTPException(status_code=400, detail="Invalid input data")
-
-# Expose Prometheus metrics
-@app.get("/metrics")
-async def metrics():
-    return await instrumentatorProm.expose()
-
-
-
-# @app.post("/auth/register")
-# async def register_user(request: Request):
-#     # Start a span for tracing
-#     with tracer.start_as_current_span("register_user"):
-#         try:
-#             # Capture the incoming request data
-#             request_data = await request.json()
-            
-#             # Inject trace context into the request headers
-#             headers = dict(request.headers)
-#             inject(headers)
-            
-#             # Forward the request to the authentication service
-#             async with httpx.AsyncClient() as client:
-#                 response = await client.post(f"{AUTH_SERVICE_URL}/auth/register", json=request_data, headers=headers)
-#                 response.raise_for_status()  # Raises an error for 4xx/5xx responses
-            
-#             # Return the response from the authentication service
-#             return response.json()
-#         except httpx.HTTPStatusError as exc:
-#             logging.error(f"HTTP error during registration: {exc.response.status_code} - {exc.response.text}")
-#             raise HTTPException(status_code=exc.response.status_code, detail=str(exc))
-#         except Exception as e:
-#             logging.error(f"Error processing registration request: {str(e)}")
-#             raise HTTPException(status_code=400, detail="Invalid input data")
-
-# @app.post("/auth/login")
-# async def login_for_access_token(request: Request):
-#     # Start a span for tracing
-#     with tracer.start_as_current_span("login_for_access_token"):
-#         try:
-#             # Capture the incoming request data
-#             request_data = await request.json()
-            
-#             # Inject trace context into the request headers
-#             headers = dict(request.headers)
-#             inject(headers)
-            
-#             # Forward the request to the authentication service
-#             async with httpx.AsyncClient() as client:
-#                 response = await client.post(f"{AUTH_SERVICE_URL}/auth/login", json=request_data, headers=headers)
-#                 response.raise_for_status()  # Raises an error for 4xx/5xx responses
-            
-#             # Return the response from the authentication service
-#             return response.json()
-#         except httpx.HTTPStatusError as exc:
-#             logging.error(f"HTTP error during login: {exc.response.status_code} - {exc.response.text}")
-#             raise HTTPException(status_code=exc.response.status_code, detail=str(exc))
-#         except Exception as e:
-#             logging.error(f"Error processing login request: {str(e)}")
-#             raise HTTPException(status_code=400, detail="Invalid input data")
-
 
 
 # Customer Service APIs

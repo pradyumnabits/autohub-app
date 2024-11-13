@@ -12,6 +12,28 @@ import jwt
 app = FastAPI()
 from fastapi.middleware.cors import CORSMiddleware
 
+# Jaeger setup
+from opentelemetry import trace
+from opentelemetry.exporter.jaeger.thrift import JaegerExporter
+from opentelemetry.sdk.resources import SERVICE_NAME, Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+
+trace.set_tracer_provider(
+    TracerProvider(
+        resource=Resource.create({SERVICE_NAME: "auth-service"})
+    )
+)
+jaeger_exporter = JaegerExporter(
+    agent_host_name="localhost",
+    agent_port=6831,
+)
+trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(jaeger_exporter))
+
+app = FastAPI()
+FastAPIInstrumentor.instrument_app(app)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -155,28 +177,69 @@ def create_token(user_id: int, user_name: str):
     )
     return token
 
+from opentelemetry import trace
+from opentelemetry.propagate import inject
+
+# Initialize tracer
+tracer = trace.get_tracer(__name__)
 
 def create_customer(user: User):
-    # Prepare customer data from the User object
-    customer_data = {
-        "userName": user.userName,  # Use userName from the User model
-        "firstName": user.firstName,
-        "lastName": user.lastName,
-        "email": user.email,
-        "phoneNumber": user.phoneNumber,
-        "address": user.address,
-        "profileStatus": "ACTIVE",  # Default profile status
-    }
+    # Start a span for tracing this function
+    with tracer.start_as_current_span("create_customer"):
+        # Prepare customer data from the User object
+        customer_data = {
+            "userName": user.userName,  # Use userName from the User model
+            "firstName": user.firstName,
+            "lastName": user.lastName,
+            "email": user.email,
+            "phoneNumber": user.phoneNumber,
+            "address": user.address,
+            "profileStatus": "ACTIVE",  # Default profile status
+        }
 
-    # Print customer data for debugging
-    print("Creating customer with the following data:", customer_data)
+        # Print customer data for debugging
+        print("Creating customer with the following data:", customer_data)
 
-    try:
-        response = requests.post(CUSTOMER_SERVICE_URL, json=customer_data)
-        response.raise_for_status()
-        return response.json()
-    except requests.RequestException as e:
-        raise HTTPException(status_code=500, detail="Failed to create customer") from e
+        try:
+            # Inject trace context into request headers
+            headers = {}
+            inject(headers)
+
+            # Send the HTTP request to the customer service
+            response = requests.post(CUSTOMER_SERVICE_URL, json=customer_data, headers=headers)
+
+            # Raise an exception for any unsuccessful HTTP responses
+            response.raise_for_status()
+
+            # Return the JSON response from the customer service
+            return response.json()
+
+        except requests.RequestException as e:
+            # Log the exception and raise a detailed HTTP exception
+            raise HTTPException(status_code=500, detail="Failed to create customer") from e
+
+
+# def create_customer(user: User):
+#     # Prepare customer data from the User object
+#     customer_data = {
+#         "userName": user.userName,  # Use userName from the User model
+#         "firstName": user.firstName,
+#         "lastName": user.lastName,
+#         "email": user.email,
+#         "phoneNumber": user.phoneNumber,
+#         "address": user.address,
+#         "profileStatus": "ACTIVE",  # Default profile status
+#     }
+
+#     # Print customer data for debugging
+#     print("Creating customer with the following data:", customer_data)
+
+#     try:
+#         response = requests.post(CUSTOMER_SERVICE_URL, json=customer_data)
+#         response.raise_for_status()
+#         return response.json()
+#     except requests.RequestException as e:
+#         raise HTTPException(status_code=500, detail="Failed to create customer") from e
 
 
 # ===========================
@@ -189,15 +252,10 @@ def ping():
 
 @app.post("/auth/register")
 def register_user(user: User):
-    print(
-        "--------------------------------------user in auth service--------------------------------------"
-    )
+    print("--------------------------------------user in auth service--------------------------------------")
     print(user)
-    user_data = create_user(user)
-    # Step 2: Call the create_customer function to add a customer
-    # customer_data = create_customer(user)
+    user_data = create_user(user)  # Creates user in DB and customer in another service
     return {"msg": "User registered successfully", "user": user_data}
-
 
 @app.post("/auth/login")
 def login_user(user: AuthUser):
@@ -206,19 +264,33 @@ def login_user(user: AuthUser):
     if not db_user:
         raise HTTPException(status_code=400, detail="Invalid user name or password")
 
-    # Verify password
-    if not verify_password(
-        user.password, db_user[3]
-    ):  # Assuming hashed_password is at index 3
+    if not verify_password(user.password, db_user[3]):
         raise HTTPException(status_code=400, detail="Invalid user name or password")
 
-    # Create and return a JWT token
-    token = create_token(db_user[0], db_user[1])
-    return {
-        "msg": "Login successful",
-        "user": {"userName": db_user[1], "email": db_user[2]},
-        "token": token,
-    }  # Assuming userName is at index 1 and email at index 2
+    token = create_token(db_user[0], db_user[1])  # Creates a JWT token
+    return {"msg": "Login successful", "user": {"userName": db_user[1], "email": db_user[2]}, "token": token}
+
+
+# @app.post("/auth/login")
+# def login_user(user: AuthUser):
+#     db_user = get_user_by_username(user.userName)
+
+#     if not db_user:
+#         raise HTTPException(status_code=400, detail="Invalid user name or password")
+
+#     # Verify password
+#     if not verify_password(
+#         user.password, db_user[3]
+#     ):  # Assuming hashed_password is at index 3
+#         raise HTTPException(status_code=400, detail="Invalid user name or password")
+
+#     # Create and return a JWT token
+#     token = create_token(db_user[0], db_user[1])
+#     return {
+#         "msg": "Login successful",
+#         "user": {"userName": db_user[1], "email": db_user[2]},
+#         "token": token,
+#     }  # Assuming userName is at index 1 and email at index 2
 
 
 # ===========================

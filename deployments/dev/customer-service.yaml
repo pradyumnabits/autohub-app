@@ -15,7 +15,7 @@ spec:
       containers:
       - name: customer-svc
         image: pradyumnakmbits/customer-svc:latest
-        imagePullPolicy: Never
+        imagePullPolicy: Always
         ports:
         - containerPort: 8007
 

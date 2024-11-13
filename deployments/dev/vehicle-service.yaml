@@ -15,7 +15,7 @@ spec:
       containers:
       - name: vehicle-svc
         image: pradyumnakmbits/vehicle-svc:latest
-        imagePullPolicy: Never
+        imagePullPolicy: Always
         ports:
         - containerPort: 8002
 

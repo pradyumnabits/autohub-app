@@ -15,7 +15,7 @@ spec:
       containers:
       - name: gateway-svc
         image: pradyumnakmbits/gateway-svc:latest
-        imagePullPolicy: Never
+        imagePullPolicy: Always
         ports:
         - containerPort: 8000
 

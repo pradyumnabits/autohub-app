@@ -15,7 +15,7 @@ spec:
       containers:
       - name: feedback-svc
         image: pradyumnakmbits/feedback-svc:latest
-        imagePullPolicy: Never
+        imagePullPolicy: Always
         ports:
         - containerPort: 8006
 

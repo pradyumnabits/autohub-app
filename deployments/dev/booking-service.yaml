@@ -15,7 +15,7 @@ spec:
       containers:
       - name: booking-svc
         image: pradyumnakmbits/booking-svc:latest
-        imagePullPolicy: Never
+        imagePullPolicy: Always
         ports:
         - containerPort: 8003
 

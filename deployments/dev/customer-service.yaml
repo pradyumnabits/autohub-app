@@ -31,6 +31,6 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 8007
-      nodePort: 30083
+      nodePort: 30080
   type: NodePort
 # Updated at Mon Nov 11 12:00:58 UTC 2024

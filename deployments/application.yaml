@@ -9,7 +9,7 @@ spec:
   source:
     repoURL: https://github.com/pradyumnabits/autohub-app.git
     targetRevision: HEAD
-    path: latest/deployment/dev
+    path: deployments/dev
   destination:
     server: https://kubernetes.default.svc
     namespace: autohub

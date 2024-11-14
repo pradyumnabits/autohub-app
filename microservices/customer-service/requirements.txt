@@ -11,4 +11,5 @@ opentelemetry-sdk
 opentelemetry-instrumentation-fastapi
 opentelemetry-exporter-jaeger
 opentelemetry-instrumentation-requests
+faker
 

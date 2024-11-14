@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Customer Service API
-  description: API for managing customer profiles
+  description: API for managing customer profiles 
   version: 1.0.0
 
 servers:

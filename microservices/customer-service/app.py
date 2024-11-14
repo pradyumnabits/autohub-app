@@ -1,12 +1,9 @@
-import datetime
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import os
 import sqlite3
 from sqlite3 import Error
-import requests
 
-# FastAPI app initialization
 app = FastAPI()
 
 # Jaeger setup for tracing
@@ -33,6 +30,7 @@ FastAPIInstrumentor.instrument_app(app)
 
 # CORS middleware setup
 from fastapi.middleware.cors import CORSMiddleware
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -41,83 +39,138 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-CUSTOMER_SERVICE_URL = "http://localhost:8007/customers"
-
 # ===========================
 # Database Setup
 # ===========================
-db_directory = os.path.join(os.getcwd(), "data")  # 'data' folder in the current directory
-os.makedirs(db_directory, exist_ok=True)  # Create the directory if it doesn't exist
-SQLALCHEMY_DATABASE_URL = f"sqlite:///{os.path.join(db_directory, 'customer_db.db')}"
+db_directory = os.path.join(os.getcwd(), "data")
+os.makedirs(db_directory, exist_ok=True)
+db_file = os.path.join(db_directory, "customers.db")
+
 
 # Function to initialize the database
 def initialize_database():
     try:
-        with sqlite3.connect(os.path.join(db_directory, "customer_db.db")) as conn:
+        with sqlite3.connect(db_file) as conn:
             cursor = conn.cursor()
-            # Create customers table
             cursor.execute(
                 """
                 CREATE TABLE IF NOT EXISTS customers (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    userName TEXT UNIQUE NOT NULL,
-                    email TEXT UNIQUE NOT NULL,
+                    userName TEXT PRIMARY KEY NOT NULL,
                     firstName TEXT NOT NULL,
                     lastName TEXT NOT NULL,
-                    phoneNumber TEXT NOT NULL,
-                    address TEXT NOT NULL,
-                    profileStatus TEXT NOT NULL
+                    email TEXT UNIQUE NOT NULL,
+                    phoneNumber TEXT,
+                    address TEXT,
+                    profileStatus TEXT DEFAULT 'active'  -- Add default status 'active'
                 )
-                """
+            """
             )
             conn.commit()
             print("Database initialized successfully.")
     except Error as e:
         print(f"Error initializing database: {e}")
 
-# Call the function to initialize the database
+
 initialize_database()
+
 
 # ===========================
 # Pydantic Schemas
 # ===========================
 class Customer(BaseModel):
     userName: str
-    email: str
     firstName: str
     lastName: str
-    phoneNumber: str
-    address: str
-    profileStatus: str  # Active/Inactive
+    email: str
+    phoneNumber: str = None
+    address: str = None
+    profileStatus: str = "ACTIVE"  # New field with a default value
+
 
 # ===========================
-# Business Logic (Customer Creation)
+# Database Access Functions
 # ===========================
 def get_db_connection():
-    conn = sqlite3.connect(os.path.join(db_directory, "customer_db.db"))
+    conn = sqlite3.connect(db_file)
     return conn
 
-def create_customer_in_db(customer: Customer):
+
+def get_all_customers():
     conn = get_db_connection()
     cursor = conn.cursor()
+    cursor.execute("SELECT * FROM customers")
+    customers = cursor.fetchall()
+    conn.close()
+    return customers
 
-    # Check if the userName already exists
-    cursor.execute("SELECT * FROM customers WHERE userName = ?", (customer.userName,))
-    db_customer = cursor.fetchone()
 
-    if db_customer:
-        conn.close()
-        raise HTTPException(status_code=400, detail="User name already registered")
+def get_customer_by_id(userName: str):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM customers WHERE userName = ?", (userName,))
+    customer = cursor.fetchone()
+    conn.close()
+    return customer
 
-    # Insert the new customer into the database
+
+def create_customer(customer: Customer):
+    conn = get_db_connection()
+    cursor = conn.cursor()
     cursor.execute(
-        "INSERT INTO customers (userName, email, firstName, lastName, phoneNumber, address, profileStatus) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        (customer.userName, customer.email, customer.firstName, customer.lastName, customer.phoneNumber, customer.address, customer.profileStatus),
+        "INSERT INTO customers (userName, firstName, lastName, email, phoneNumber, address, profileStatus) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (
+            customer.userName,
+            customer.firstName,
+            customer.lastName,
+            customer.email,
+            customer.phoneNumber,
+            customer.address,
+            customer.profileStatus,
+        ),
     )
     conn.commit()
     conn.close()
 
-    return {"userName": customer.userName, "email": customer.email, "profileStatus": customer.profileStatus}
+
+def update_customer(userName: str, customer: Customer):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE customers SET firstName = ?, lastName = ?, email = ?, phoneNumber = ?, address = ?, profileStatus = ? WHERE userName = ?",
+        (
+            customer.firstName,
+            customer.lastName,
+            customer.email,
+            customer.phoneNumber,
+            customer.address,
+            customer.profileStatus,
+            userName,
+        ),
+    )
+    conn.commit()
+    conn.close()
+
+
+def delete_customer(userName: str):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE customers SET profileStatus = 'inactive' WHERE userName = ?",
+        (userName,),
+    )
+    conn.commit()
+    conn.close()
+
+
+def update_customer_status(userName: str, status: str):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE customers SET profileStatus = ? WHERE userName = ?", (status, userName)
+    )
+    conn.commit()
+    conn.close()
+
 
 # ===========================
 # Routing and Business Logic
@@ -126,71 +179,67 @@ def create_customer_in_db(customer: Customer):
 def ping():
     return {"msg": "pong-customer-svc"}
 
-@app.post("/customers")
-def register_customer(customer: Customer):
-    print(f"Registering customer: {customer}")
-    create_customer_in_db(customer)
-    return {"msg": "Customer registered successfully", "customer": customer}
+
+@app.get("/customers")
+def list_customers():
+    customers = get_all_customers()
+    return [
+        {
+            "userName": c[0],
+            "firstName": c[1],
+            "lastName": c[2],
+            "email": c[3],
+            "phoneNumber": c[4],
+            "address": c[5],
+            "profileStatus": c[6],
+        }
+        for c in customers
+    ]
+
+
+@app.post("/customers", status_code=201)
+def create_new_customer(customer: Customer):
+    create_customer(customer)
+    return customer
+
 
 @app.get("/customers/{userName}")
 def get_customer(userName: str):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM customers WHERE userName = ?", (userName,))
-    customer = cursor.fetchone()
-    conn.close()
-
-    if not customer:
+    customer = get_customer_by_id(userName)
+    if customer is None:
         raise HTTPException(status_code=404, detail="Customer not found")
-
     return {
-        "userName": customer[1],
-        "email": customer[2],
-        "firstName": customer[3],
-        "lastName": customer[4],
-        "phoneNumber": customer[5],
-        "address": customer[6],
-        "profileStatus": customer[7],
+        "userName": customer[0],
+        "firstName": customer[1],
+        "lastName": customer[2],
+        "email": customer[3],
+        "phoneNumber": customer[4],
+        "address": customer[5],
+        "profileStatus": customer[6],
     }
 
-@app.post("/customers/update/{userName}")
-def update_customer(userName: str, customer: Customer):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM customers WHERE userName = ?", (userName,))
-    existing_customer = cursor.fetchone()
 
+@app.put("/customers/{userName}")
+def update_existing_customer(userName: str, customer: Customer):
+    existing_customer = get_customer_by_id(userName)
+    if existing_customer is None:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    update_customer(userName, customer)
+    return customer
+
+
+@app.delete("/customers/{userName}", status_code=204)
+def remove_customer(userName: str):
+    existing_customer = get_customer_by_id(userName)
+    if existing_customer is None:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    delete_customer(userName)
+
+
+@app.put("/customers/{userName}/status", response_model=dict)
+def update_customer_profile_status(userName: str, status: str = "ACTIVE"):
+    existing_customer = get_customer_by_id(userName)
     if not existing_customer:
-        conn.close()
         raise HTTPException(status_code=404, detail="Customer not found")
-
-    # Update the customer details in the database
-    cursor.execute(
-        """
-        UPDATE customers SET email = ?, firstName = ?, lastName = ?, phoneNumber = ?, address = ?, profileStatus = ? 
-        WHERE userName = ?
-        """,
-        (customer.email, customer.firstName, customer.lastName, customer.phoneNumber, customer.address, customer.profileStatus, userName),
-    )
-    conn.commit()
-    conn.close()
-
-    return {"msg": "Customer updated successfully"}
-
-@app.post("/customers/deactivate/{userName}")
-def deactivate_customer(userName: str):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM customers WHERE userName = ?", (userName,))
-    customer = cursor.fetchone()
-
-    if not customer:
-        conn.close()
-        raise HTTPException(status_code=404, detail="Customer not found")
-
-    # Update the customer status to 'Inactive'
-    cursor.execute("UPDATE customers SET profileStatus = 'INACTIVE' WHERE userName = ?", (userName,))
-    conn.commit()
-    conn.close()
-
-    return {"msg": "Customer deactivated successfully"}
+    update_customer_status(userName, status)
+    return {"userName": userName, "profileStatus": status}

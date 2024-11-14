@@ -28,7 +28,7 @@ const Login = () => {
       if (loginResponse["payload"]["user"] != null) {
         setPassword("");
         setUsername("");
-        navigate("/page1");
+        navigate("/dashboard");
         console.log("Thanks");
       }
     } catch (error) {

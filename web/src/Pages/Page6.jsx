@@ -15,28 +15,31 @@ function Page6() {
 
 function CarPurchasePage({ vehicle }) {
   const [transactionId, setTransactionId] = useState("");
+  const [transactionDate, setTransactionDate] = useState("");
+  const [transactionPrice, setTransactionPrice] = useState(vehicle.price || 0);
+  const [transactionMethod, setTransactionMethod] = useState("");
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [purchaseStatus, setPurchaseStatus] = useState(null);
 
   const handlePurchase = () => {
-    if (!transactionId) {
-      alert("Please enter a transaction ID.");
+    if (!transactionId || !transactionDate || !transactionMethod) {
+      alert("Please fill in all required fields.");
       return;
     }
 
     setIsPurchasing(true);
-
     const user = localStorage.getItem("user");
-
     const userId = JSON.parse(user);
 
     const data = {
-      vehicle_id: vehicle.id,
       user_name: userId.userName,
+      vehicle_id: vehicle.id,
       transaction_id: transactionId,
+      transaction_date: transactionDate,
+      transaction_price: Number(transactionPrice),
+      transaction_method: transactionMethod
     };
 
-    // API call to purchase car
     axios
       .post("http://localhost:8003/bookings", data)
       .then((response) => {
@@ -61,7 +64,7 @@ function CarPurchasePage({ vehicle }) {
         />
         <h3 className="text-2xl font-semibold">{vehicle.model}</h3>
         <p className="text-lg font-semibold text-gray-400 mb-2">
-          Price: ${vehicle.price}
+          Price: ₹{vehicle.price}
         </p>
         <p className="text-gray-400 mb-1">Fuel Type: {vehicle.fuel_type}</p>
         <p className="text-gray-400 mb-1">Body Type: {vehicle.body_type}</p>
@@ -69,24 +72,75 @@ function CarPurchasePage({ vehicle }) {
         <p className="text-gray-400">Transmission: {vehicle.transmission}</p>
       </section>
 
-      {/* Purchase Section */}
+      {/* Updated Purchase Section */}
       <section className="bg-gray-800 p-6 rounded-md shadow-md">
         <h4 className="text-xl font-semibold mb-4">Complete Your Purchase</h4>
-        <input
-          type="text"
-          placeholder="Enter Transaction ID"
-          value={transactionId}
-          onChange={(e) => setTransactionId(e.target.value)}
-          className="w-full p-2 rounded-md bg-gray-900 text-white mb-4"
-        />
-        <button
-          onClick={handlePurchase}
-          disabled={isPurchasing}
-          className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-md w-full"
-        >
-          {isPurchasing ? "Processing..." : "Booking Confirm"}
-        </button>
-        {purchaseStatus && <p className="text-center mt-4">{purchaseStatus}</p>}
+        
+        <div className="space-y-4">
+          <div>
+            <label className="block text-gray-300 mb-2">Transaction Reference ID</label>
+            <input
+              type="text"
+              placeholder="Enter Transaction Reference ID"
+              value={transactionId}
+              onChange={(e) => setTransactionId(e.target.value)}
+              className="w-full p-2 rounded-md bg-gray-900 text-white"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-300 mb-2">Transaction Date</label>
+            <input
+              type="date"
+              value={transactionDate}
+              onChange={(e) => setTransactionDate(e.target.value)}
+              className="w-full p-2 rounded-md bg-gray-900 text-white"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-300 mb-2">Transaction Ammount (₹)</label>
+            <input
+              type="number"
+              value={transactionPrice}
+              onChange={(e) => setTransactionPrice(e.target.value)}
+              className="w-full p-2 rounded-md bg-gray-900 text-white"
+              min="0"
+              step="0.01"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-300 mb-2">Payment Method</label>
+            <select
+              value={transactionMethod}
+              onChange={(e) => setTransactionMethod(e.target.value)}
+              className="w-full p-2 rounded-md bg-gray-900 text-white"
+              required
+            >
+              <option value="">Select payment method</option>
+              <option value="credit_card">Credit Card</option>
+              <option value="debit_card">Debit Card</option>
+              <option value="bank_transfer">Bank Transfer</option>
+              <option value="cash">Cash</option>
+            </select>
+          </div>
+
+          <button
+            onClick={handlePurchase}
+            disabled={isPurchasing}
+            className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-md w-full mt-4"
+          >
+            {isPurchasing ? "Processing..." : "Confirm Purchase"}
+          </button>
+          
+          {purchaseStatus && (
+            <p className="text-center mt-4">{purchaseStatus}</p>
+          )}
+        </div>
       </section>
     </div>
   );

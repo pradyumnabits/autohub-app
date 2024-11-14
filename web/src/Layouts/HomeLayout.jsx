@@ -5,7 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 function HomeLayout({ children }) {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
-  const showDashboard = ['/page1', '/page2', '/page3', '/page4', '/page5', '/page6', '/page7'].includes(location.pathname);
+  const showDashboard = ['/dashboard', '/catalog', '/testdrivebook', '/support', '/rsa', '/book', '/feedbackp'].includes(location.pathname);
 
   return (
     <div>
@@ -18,7 +18,7 @@ function HomeLayout({ children }) {
           <div className="space-x-4">
             {showDashboard && (
               <Link
-                to="/page1"
+                to="/dashboard"
                 className="text-white hover:text-gray-300 transition flex items-center"
               >
                 <svg 

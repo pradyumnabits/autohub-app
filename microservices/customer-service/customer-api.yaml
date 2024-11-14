@@ -1,65 +1,79 @@
-openapi: 3.0.2
+openapi: 3.0.0
 info:
-  title: Customer API
-  description: API for managing customer data  
+  title: Customer Service API
+  description: API for managing customer profiles
   version: 1.0.0
 
+servers:
+  - url: http://localhost:8007
+    description: local server
+
 paths:
+  /ping:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    example: pong-customer-svc
+
   /customers:
     get:
-      summary: Get all customers
-      description: Retrieve a list of all customers.
+      summary: List all customers
       responses:
-        200:
-          description: A list of customers.
+        "200":
+          description: A list of customers
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CustomerResponse'
+                  $ref: "#/components/schemas/CustomerResponse"
     post:
       summary: Create a new customer
-      description: Add a new customer to the database.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Customer'
+              $ref: "#/components/schemas/Customer"
       responses:
-        201:
-          description: Customer created successfully.
+        "201":
+          description: Customer created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerResponse'
+                $ref: "#/components/schemas/Customer"
 
-  /customers/{userId}:
+  /customers/{userName}:
     get:
-      summary: Get a customer by ID
-      description: Retrieve a single customer by their userId.
+      summary: Retrieve a customer by userName
       parameters:
-        - name: userId
+        - name: userName
           in: path
           required: true
           schema:
             type: string
       responses:
-        200:
-          description: The requested customer.
+        "200":
+          description: Customer found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerResponse'
-        404:
-          description: Customer not found.
-
+                $ref: "#/components/schemas/CustomerResponse"
+        "404":
+          description: Customer not found
     put:
       summary: Update an existing customer
-      description: Modify the details of an existing customer by userId.
       parameters:
-        - name: userId
+        - name: userName
           in: path
           required: true
           schema:
@@ -69,82 +83,111 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Customer'
+              $ref: "#/components/schemas/Customer"
       responses:
-        200:
-          description: Customer updated successfully.
+        "200":
+          description: Customer updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerResponse'
-        404:
-          description: Customer not found.
-
+                $ref: "#/components/schemas/Customer"
+        "404":
+          description: Customer not found
     delete:
-      summary: Deactivate a customer
-      description: Mark a customer as 'inactive' by updating their profileStatus.
+      summary: Soft delete a customer by marking profile status as 'inactive'
       parameters:
-        - name: userId
+        - name: userName
           in: path
           required: true
           schema:
             type: string
       responses:
-        204:
-          description: Customer deactivated successfully.
-        404:
-          description: Customer not found.
+        "204":
+          description: Customer deleted successfully
+        "404":
+          description: Customer not found
+
+  /customers/{userName}/status:
+    put:
+      summary: Update a customer's profile status
+      parameters:
+        - name: userName
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [active, inactive]
+                  default: active
+      responses:
+        "200":
+          description: Profile status updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userName:
+                    type: string
+                  profileStatus:
+                    type: string
+        "404":
+          description: Customer not found
 
 components:
   schemas:
     Customer:
       type: object
+      required:
+        - userName
+        - firstName
+        - lastName
+        - email
       properties:
-        userId:
+        userName:
           type: string
-          description: Unique identifier for the customer.
         firstName:
           type: string
-          description: First name of the customer.
         lastName:
           type: string
-          description: Last name of the customer.
         email:
           type: string
-          description: Email address of the customer.
         phoneNumber:
           type: string
-          description: Phone number of the customer.
+          nullable: true
         address:
           type: string
-          description: Address of the customer.
+          nullable: true
         profileStatus:
           type: string
-          description: Status of the customer profile.
-          default: ACTIVE
+          enum: [active, inactive]
+          default: active
 
     CustomerResponse:
       type: object
       properties:
-        userId:
+        userName:
           type: string
-          description: Unique identifier for the customer.
         firstName:
           type: string
-          description: First name of the customer.
         lastName:
           type: string
-          description: Last name of the customer.
         email:
           type: string
-          description: Email address of the customer.
         phoneNumber:
           type: string
-          description: Phone number of the customer.
+          nullable: true
         address:
           type: string
-          description: Address of the customer.
+          nullable: true
         profileStatus:
           type: string
-          description: Status of the customer profile.
-          default: ACTIVE
+          enum: [active, inactive]

@@ -21,7 +21,8 @@ function RoadsideAssistance() {
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [location, setLocation] = useState("");
-  // const [appointmentDate, setAppointmentDate] = useState("");
+  const [contactNumber, setContactNumber] = useState("");
+  const [assistanceType, setAssistanceType] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showSnackbar, setShowSnackbar] = useState(false);
@@ -85,6 +86,8 @@ function RoadsideAssistance() {
         vehicle_id: selectedVehicle.id,
         user_id: userId.userName,
         location,
+        contact_number: contactNumber,
+        assistance_type: assistanceType,
       });
       setRsaHistory([...rsaHistory, response.data]);
       handleCloseModal();
@@ -256,12 +259,41 @@ function RoadsideAssistance() {
                 />
               </div>
 
+              <div>
+                <label className="block text-gray-300 mb-2">Contact Number</label>
+                <input
+                  type="tel"
+                  value={contactNumber}
+                  onChange={(e) => setContactNumber(e.target.value)}
+                  className="w-full p-2 bg-gray-700 text-gray-300 rounded-md"
+                  placeholder="Enter your contact number"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-300 mb-2">Assistance Type</label>
+                <select
+                  value={assistanceType}
+                  onChange={(e) => setAssistanceType(e.target.value)}
+                  className="w-full p-2 bg-gray-700 text-gray-300 rounded-md"
+                  required
+                >
+                  <option value="">Select assistance type</option>
+                  <option value="flat_tire">Flat Tire</option>
+                  <option value="battery_jump">Battery Jump Start</option>
+                  <option value="towing">Towing</option>
+                  <option value="fuel_delivery">Fuel Delivery</option>
+                  <option value="lockout">Others</option>
+                </select>
+              </div>
+
               <button
                 type="submit"
                 className="w-full bg-blue-600 p-3 rounded-md hover:bg-blue-700 transition"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Submitting..." : "Schedule Appointment"}
+                {isSubmitting ? "Submitting..." : "Request Assistance"}
               </button>
             </form>
           </div>

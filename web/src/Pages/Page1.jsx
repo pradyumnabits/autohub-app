@@ -107,7 +107,7 @@ function Dashboard() {
     <div className="bg-gray-700 min-h-screen p-8 text-white">
       <div className="flex justify-end space-x-4 mb-6">
         <Link 
-          to="/page2" 
+          to="/catalog" 
           className="flex items-center bg-gray-800 hover:bg-gray-600 px-4 py-2 rounded-md"
         >
           <svg 
@@ -123,11 +123,11 @@ function Dashboard() {
               d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
             />
           </svg>
-          Vehicles
+          Vehicles Catalog
         </Link>
 
         <Link 
-          to="/page5" 
+          to="/rsa" 
           className="flex items-center bg-gray-800 hover:bg-gray-600 px-4 py-2 rounded-md"
         >
           <svg 
@@ -147,7 +147,7 @@ function Dashboard() {
         </Link>
 
         <Link 
-          to="/page4" 
+          to="/support" 
           className="flex items-center bg-gray-800 hover:bg-gray-600 px-4 py-2 rounded-md"
         >
           <svg 
@@ -167,7 +167,7 @@ function Dashboard() {
         </Link>
 
         <Link 
-          to="/page7" 
+          to="/feedbackp" 
           className="flex items-center bg-gray-800 hover:bg-gray-600 px-4 py-2 rounded-md"
         >
           <svg 

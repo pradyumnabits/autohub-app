@@ -1,6 +1,9 @@
 import requests
 import uuid
 from faker import Faker
+import subprocess
+import time
+
 
 fake = Faker()
 
@@ -68,12 +71,47 @@ def test_delete_customer(user_id):
     else:
         print("Customer deletion failed")
 
+# if __name__ == "__main__":
+#     # Run the tests
+#     user_id = test_create_customer()  # Generate a random userId during customer creation
+#     test_get_customers()
+#     test_get_customer_by_id(user_id)
+#     test_update_customer(user_id)
+#     test_get_customer_by_id(user_id)  # Check updated customer details
+#     test_delete_customer(user_id)
+#     test_get_customers()  # Check remaining customers
+
+
+# Function to start the FastAPI server in the background
+def start_server():
+    """Start the FastAPI server using uvicorn."""
+    return subprocess.Popen(["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8007"])
+
+# Function to stop the server after testing
+def stop_server(process):
+    """Stop the FastAPI server."""
+    process.terminate()  # Send SIGTERM to stop the server
+    process.wait()
+
+
 if __name__ == "__main__":
-    # Run the tests
-    user_id = test_create_customer()  # Generate a random userId during customer creation
-    test_get_customers()
-    test_get_customer_by_id(user_id)
-    test_update_customer(user_id)
-    test_get_customer_by_id(user_id)  # Check updated customer details
-    test_delete_customer(user_id)
-    test_get_customers()  # Check remaining customers
+    # Start the server in the background
+    print("Starting the FastAPI server...")
+    server_process = start_server()
+
+    # Allow some time for the server to start up (adjust as needed)
+    time.sleep(5)
+
+    try:
+        # Run the tests
+        user_id = test_create_customer()  # Generate a random userId during customer creation
+        test_get_customers()
+        test_get_customer_by_id(user_id)
+        test_update_customer(user_id)
+        test_get_customer_by_id(user_id)  # Check updated customer details
+        test_delete_customer(user_id)
+        test_get_customers()  # Check remaining customers
+    finally:
+        # Stop the server after tests are completed
+        print("Stopping the FastAPI server...")
+        stop_server(server_process)

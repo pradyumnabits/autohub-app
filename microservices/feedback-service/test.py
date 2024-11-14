@@ -70,8 +70,9 @@ def test_submit_invalid_feedback():
     }
     response = requests.post(f"{BASE_URL}/submit", json=invalid_feedback_data)
     print(f"Status Code: {response.status_code}")
-    if response.status_code == 400:
-        print(f"Response: {response.json()}")
+    if response.status_code == 422:
+        print(f"Success")
+        #print(f"Response: {response.json()}")
     else:
         print("Unexpected response for invalid feedback")
 

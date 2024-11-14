@@ -127,19 +127,21 @@ def create_request(request: RoadsideAssistanceRequest):
 def get_all_requests(user_id: str):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM requests WHERE ")
+    cursor.execute("SELECT * FROM requests WHERE user_id = ?", (user_id,))
     requests = cursor.fetchall()
     conn.close()
     return requests
 
 
+
 def get_request_by_id(request_id: str):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM requests WHERE user_id = ?", (request_id,))
-    request = cursor.fetchall()
+    cursor.execute("SELECT * FROM requests WHERE id = ?", (request_id,))
+    response = cursor.fetchall()
+    print(response)
     conn.close()
-    return request
+    return response
 
 
 def update_request_funn(userid: str, data: UpdateRoadsideAssistanceRequest):
@@ -161,7 +163,7 @@ def get_vehicle_details(vehicle_id: str):
         return response.json()
     except requests.RequestException as e:
         raise HTTPException(
-            status_code=500, detail="Failed to get customer details"
+            status_code=500, detail="Failed to get vehicle details"
         ) from e
 
 
@@ -208,7 +210,7 @@ def update_request(userId: str, data: UpdateRoadsideAssistanceRequest):
 
 @app.get("/rsa/requests")
 def get_all_roadside_requests(userId: str):
-    requests = get_request_by_id(userId)
+    requests = get_all_requests(userId)
     response = []
     for r in requests:
         vehicle_details = get_vehicle_details(r[2])
@@ -228,19 +230,32 @@ def get_all_roadside_requests(userId: str):
 
 @app.get("/rsa/requests/{requestId}")
 def get_roadside_status(requestId: str):
-    request = get_request_by_id(requestId)
-    print(request)
-    print(requestId)
-    if request is None:
-        raise HTTPException(status_code=404, detail="Request not found")
+    response = get_request_by_id(requestId)
+
+    # Check if response is empty (no matching request found)
+    if not response:
+        raise HTTPException(status_code=404, detail="No data found")
+
+    # Unpack the first record (since `get_request_by_id` is expected to return a list of tuples)
+    r = response[0]
+
+    # Ensure `r` has the expected number of elements
+    if len(r) < 8:
+        raise HTTPException(status_code=500, detail="Invalid response format")
+
+    # Construct the response dictionary
     return {
-        "id": request[0],
-        "user_id": request[1],
-        "vehicle_id": request[2],
-        "location": request[3],
-        "status": request[4],
-        "provider": request[5],
+        "id": r[0],
+        "user_id": r[1],
+        "vehicle_id": r[2],
+        "location": r[3],
+        "status": r[4],
+        "provider": r[5],
+        "contact_number": r[6],
+        "assistance_type": r[7],
     }
+
+
 
 
 # ===========================

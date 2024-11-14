@@ -160,6 +160,7 @@ def create_test_drive(test_drive: TestDrive):
             test_drive.status,
         ),
     )
+    test_drive_id = cursor.lastrowid
     conn.commit()
     conn.close()
 
@@ -200,8 +201,10 @@ def create_booking(booking: Booking):
             booking.transaction_method
         ),  # Updated field name
     )
+    booking_id = cursor.lastrowid  # Retrieve the auto-generated booking ID
     conn.commit()
     conn.close()
+    return booking_id
 
 
 # function to get vehicle details
@@ -297,7 +300,8 @@ def book_test_drive(booking: TestDriveBooking):
         time=booking.time,
         status="Confirmed",
     )
-    create_test_drive(new_test_drive)
+    test_drive_id  = create_test_drive(new_test_drive)
+    new_test_drive.id = test_drive_id
     return new_test_drive
 
 
@@ -374,12 +378,13 @@ def book_vehicle(booking_request: BookingRequest):
         transaction_price=booking_request.transaction_price,
         transaction_method=booking_request.transaction_method
     )
-    create_booking(new_booking)
+    booking_id = create_booking(new_booking)
 
     # Update customer profile status after successful booking
     # update_result = update_customer_profile(booking_request.user_name)
     # if update_result is None:
     #     raise HTTPException(status_code=500, detail="Failed to update customer profile status")
+    new_booking.id = booking_id
 
     return new_booking
 

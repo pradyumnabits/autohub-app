@@ -250,7 +250,7 @@ def ping():
     return {"msg": "pong-auth-svc"}
 
 
-@app.post("/auth/register")
+@app.post("/auth/register", status_code=201)
 def register_user(user: User):
     print("--------------------------------------user in auth service--------------------------------------")
     print(user)

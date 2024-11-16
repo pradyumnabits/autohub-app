@@ -54,10 +54,58 @@ def initialize_database():
     except Error as e:
         print(f"Error initializing database: {e}")
 
+# Function to seed data into the database
+def seed_data():
+    try:
+        with sqlite3.connect(os.path.join(db_directory, "vehicles.db")) as conn:
+            cursor = conn.cursor()
+            # Check if the table is empty
+            cursor.execute("SELECT COUNT(*) FROM vehicles")
+            count = cursor.fetchone()[0]
+            if count == 0:
+                # Insert seed data
+                seed_data = [
+                    # Hatchbacks
+                    ("1", "Maruti Suzuki", "Swift", 2024, 800000, "Petrol", "Manual", "Hatchback", "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"),
+                    ("2", "Hyundai", "i20", 2024, 950000, "Petrol", "Manual", "Hatchback", "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"),
+                    ("3", "Tata", "Altroz", 2024, 850000, "Diesel", "Manual", "Hatchback", "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"),
+                    # Sedans
+                    ("4", "Honda", "City", 2024, 1500000, "Petrol", "Automatic", "Sedan", "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"),
+                    ("5", "Hyundai", "Verna", 2024, 1400000, "Diesel", "Automatic", "Sedan", "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"),
+                    ("6", "Skoda", "Octavia", 2024, 2600000, "Petrol", "Automatic", "Sedan", "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"),
+                    # SUVs
+                    ("7", "Hyundai", "Creta", 2024, 1500000, "Diesel", "Automatic", "SUV", "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"),
+                    ("8", "Tata", "Nexon", 2024, 1400000, "Electric", "Automatic", "SUV", "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"),
+                    ("9", "Mahindra", "XUV700", 2024, 2000000, "Diesel", "Automatic", "SUV", "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"),
+                    ("10", "Toyota", "Fortuner", 2024, 4000000, "Diesel", "Automatic", "SUV", "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"),
+                    ("11", "Kia", "Seltos", 2024, 1700000, "Petrol", "Automatic", "SUV", "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"),
+                    # MPVs
+                    ("12", "Toyota", "Innova Crysta", 2024, 2500000, "Diesel", "Manual", "MPV", "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"),
+                    ("13", "Maruti Suzuki", "Ertiga", 2024, 1200000, "Petrol", "Manual", "MPV", "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"),
+                    ("14", "Mahindra", "Marazzo", 2023, 1500000, "Diesel", "Manual", "MPV", "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"),
+                    # Electric
+                    ("15", "MG", "ZS EV", 2024, 2300000, "Electric", "Automatic", "SUV", "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"),
+                    ("16", "Hyundai", "Ioniq 5", 2024, 4500000, "Electric", "Automatic", "SUV", "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"),
+                    ("17", "Tata", "Tiago EV", 2024, 850000, "Electric", "Automatic", "Hatchback", "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"),
+                    # Luxury
+                    ("18", "Mercedes-Benz", "E-Class", 2024, 8500000, "Diesel", "Automatic", "Sedan", "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"),
+                    ("19", "BMW", "X5", 2024, 9500000, "Diesel", "Automatic", "SUV", "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"),
+                    ("20", "Audi", "Q7", 2024, 8000000, "Petrol", "Automatic", "SUV", "https://cdn.pixabay.com/photo/2015/01/19/13/51/car-604019_1280.jpg"),
+                ]
+                cursor.executemany(
+                    "INSERT INTO vehicles (id, make, model, year, price, fuel_type, transmission, body_type, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    seed_data,
+                )
+                conn.commit()
+                print("Seed data loaded successfully with updated image URLs.")
+    except Error as e:
+        print(f"Error seeding data: {e}")
+
+
 
 # Call the function to initialize the database
 initialize_database()
-
+seed_data()
 
 # ===========================
 # Pydantic Schemas

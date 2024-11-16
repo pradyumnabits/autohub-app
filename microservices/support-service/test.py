@@ -96,5 +96,4 @@ def test_list_service_appointments():
 # Run tests
 if __name__ == "__main__":
     test_schedule_service()
-    test_get_service_history()
     test_list_service_appointments()

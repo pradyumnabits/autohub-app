@@ -386,9 +386,9 @@ async def book_test_drive(request: Request):
         raise HTTPException(status_code=400, detail="Invalid input data")
 
 
-@app.get("/vehicles/{test_drive_id}")
+@app.get("/testdrives/{test_drive_id}")
 async def get_testdrives_by_id(test_drive_id: str, request: Request):
-    return await forward_request(f"{BOOKING_SERVICE_URL}/testdrives/{test_drive_id}", request)
+    return await forward_request(f"{BOOKING_SERVICE_URL}", request)
 
 
 

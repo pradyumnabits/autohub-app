@@ -362,7 +362,7 @@ async def get_vehicles(request: Request):
 
 @app.get("/vehicles/{vehicle_id}")
 async def get_vehicle_by_id(vehicle_id: str, request: Request):
-    return await forward_request(f"{VEHICLE_SERVICE_URL}/vehicles/{vehicle_id}", request)
+    return await forward_request(f"{VEHICLE_SERVICE_URL}", request)
 
 # Booking Service APIs
 @app.get("/testdrives")

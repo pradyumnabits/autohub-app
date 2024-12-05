@@ -461,4 +461,4 @@ async def submit_feedback(request: Request):
 
 @app.get("/feedback/{id}")
 async def get_feedback_by_id(id: str, request: Request):
-    return await forward_request(f"{CUSTOMER_FEEDBACK_URL}/feedback/{id}", request)
+    return await forward_request(f"{CUSTOMER_FEEDBACK_URL}", request)

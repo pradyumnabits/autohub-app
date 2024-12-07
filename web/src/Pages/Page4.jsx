@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import HomeLayout from "../Layouts/HomeLayout";
-import Lottie from 'lottie-react';
-import carAnimation from '../assets/Images/SSO_Icons/car-loading.json'; // Update path as needed
-import Snackbar from '../components/Snackbar'; // Add this import
+import Lottie from "lottie-react";
+import carAnimation from "../assets/Images/SSO_Icons/car-loading.json"; // Update path as needed
+import Snackbar from "../components/Snackbar"; // Add this import
+import { AllUrl } from "../Helpers/allUrl";
 // page for Post seals service management
 function Page4() {
   return (
@@ -24,7 +25,7 @@ function PostSaleServiceManagement() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showSnackbar, setShowSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   // Fetch booked vehicles
   useEffect(() => {
@@ -33,7 +34,7 @@ function PostSaleServiceManagement() {
     const fetchBookedVehicles = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8003/bookings?user_name=${userId.userName}`
+          `${AllUrl.bookingServiceUrl}/bookings?user_name=${userId.userName}`
         );
         setBookedVehicles(response.data);
       } catch (error) {
@@ -52,7 +53,7 @@ function PostSaleServiceManagement() {
     const fetchServiceHistory = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8004/service/history?user_id=${userId.userName}`
+          `${AllUrl.supportServiceUrl}/service/history?user_id=${userId.userName}`
         );
         setServiceHistory(response.data);
       } catch (error) {
@@ -82,7 +83,7 @@ function PostSaleServiceManagement() {
     const userId = JSON.parse(user);
     try {
       const response = await axios.post(
-        "http://localhost:8004/service/schedule",
+        `${AllUrl.supportServiceUrl}/service/schedule`,
         {
           vehicle_id: selectedVehicle.id,
           service_type: serviceType,
@@ -92,20 +93,19 @@ function PostSaleServiceManagement() {
       );
       setServiceHistory([...serviceHistory, response.data]);
       handleCloseModal();
-      
+
       // Show success snackbar
-      setSnackbarMessage('Service appointment scheduled successfully!');
+      setSnackbarMessage("Service appointment scheduled successfully!");
       setShowSnackbar(true);
-      
+
       // Hide snackbar after 3 seconds
       setTimeout(() => {
         setShowSnackbar(false);
       }, 3000);
-      
     } catch (error) {
       console.error("Error submitting service request:", error);
       // Optionally show error snackbar
-      setSnackbarMessage('Failed to schedule appointment. Please try again.');
+      setSnackbarMessage("Failed to schedule appointment. Please try again.");
       setShowSnackbar(true);
     } finally {
       setIsSubmitting(false);
@@ -114,14 +114,15 @@ function PostSaleServiceManagement() {
 
   if (loadingVehicles || loadingHistory) {
     return (
-      <div className="p-6 flex items-center justify-center bg-gray-700" style={{ minHeight: "calc(100vh - 64px)" }}>
+      <div
+        className="p-6 flex items-center justify-center bg-gray-700"
+        style={{ minHeight: "calc(100vh - 64px)" }}
+      >
         <div className="text-center">
-          <div className="w-48 h-48 mx-auto"> {/* Adjust size as needed */}
-            <Lottie
-              animationData={carAnimation}
-              loop={true}
-              autoplay={true}
-            />
+          <div className="w-48 h-48 mx-auto">
+            {" "}
+            {/* Adjust size as needed */}
+            <Lottie animationData={carAnimation} loop={true} autoplay={true} />
           </div>
           <p className="text-xl text-white">Loading support services...</p>
         </div>

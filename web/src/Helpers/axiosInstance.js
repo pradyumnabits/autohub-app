@@ -1,8 +1,9 @@
 // src/Components/Helpers/axiosInstance.js
 import axios from "axios";
+import { AllUrl } from "./allUrl";
 
 const axiosInstance = axios.create({
-  baseURL: "http://127.0.0.1:8001",
+  baseURL: AllUrl.authServiceUrl,
   headers: {
     "Content-Type": "application/json",
   },

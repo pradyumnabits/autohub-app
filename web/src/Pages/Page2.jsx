@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import HomeLayout from "../Layouts/HomeLayout";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import { AllUrl } from "../Helpers/allUrl";
 
 // page for vehicle list
 function Page2() {
@@ -22,7 +23,9 @@ function VehiclePage() {
   useEffect(() => {
     const fetchVehicles = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8002/vehicles");
+        const response = await axios.get(
+          `${AllUrl.vehicleServiceUrl}/vehicles`
+        );
         setVehicles(response.data);
         console.log("vehicles", response.data);
         setLoading(false);
@@ -129,7 +132,7 @@ function VehicleDetails({ vehicle, onClose }) {
         <div className="text-gray-400 mb-4">{vehicle.year}</div>
         <h3 className="font-semibold text-lg mb-1">Specifications</h3>
         <ul className="text-gray-400 mb-4">
-          <li>Price: ${vehicle.price}</li>
+          <li>Price: ₹{vehicle.price}</li>
           <li>Fuel Type: {vehicle.fuel_type}</li>
           <li>Transmission: {vehicle.transmission}</li>
           <li>Body Type: {vehicle.body_type}</li>

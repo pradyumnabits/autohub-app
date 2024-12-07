@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import HomeLayout from "../Layouts/HomeLayout";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
+import { AllUrl } from "../Helpers/allUrl";
 // this page is to book test drive
 function Page3() {
   const location = useLocation();
@@ -34,7 +35,7 @@ function TestDriveBooking({ vehicle }) {
       time,
     };
     axios
-      .post("http://localhost:8003/testdrives/book", data)
+      .post(`${AllUrl.bookingServiceUrl}/testdrives/book`, data)
       .then((res) => {
         console.log(res);
 
@@ -76,7 +77,7 @@ function TestDriveBooking({ vehicle }) {
               <div>
                 <p className="text-gray-300">Model: {vehicle.model}</p>
                 <p className="text-gray-300">Make: {vehicle.make}</p>
-                <p className="text-gray-300">Price: ${vehicle.price}</p>
+                <p className="text-gray-300">Price: ₹{vehicle.price}</p>
                 <p className="text-gray-300">Type: {vehicle.body_type}</p>
               </div>
             </div>

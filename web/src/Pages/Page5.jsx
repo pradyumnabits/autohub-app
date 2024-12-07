@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import HomeLayout from "../Layouts/HomeLayout";
 import axios from "axios";
-import Lottie from 'lottie-react';
-import carAnimation from '../assets/Images/SSO_Icons/car-loading.json'; // Update path as needed
-import Snackbar from '../components/Snackbar'; // Add this import at the top
+import Lottie from "lottie-react";
+import carAnimation from "../assets/Images/SSO_Icons/car-loading.json"; // Update path as needed
+import Snackbar from "../components/Snackbar"; // Add this import at the top
+import { AllUrl } from "../Helpers/allUrl";
 
 // page for Roadside Assistance
 function Page5() {
@@ -26,7 +27,7 @@ function RoadsideAssistance() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showSnackbar, setShowSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   // Fetch booked vehicles
   useEffect(() => {
@@ -35,7 +36,7 @@ function RoadsideAssistance() {
     const fetchBookedVehicles = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8003/bookings?user_name=${userId.userName}`
+          `${AllUrl.bookingServiceUrl}/bookings?user_name=${userId.userName}`
         );
         setBookedVehicles(response.data);
       } catch (error) {
@@ -54,7 +55,7 @@ function RoadsideAssistance() {
     const fetchRsaHistory = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8005/rsa/requests?userId=${userId.userName}`
+          `${AllUrl.roadsideAssistanceUrl}/rsa/requests?userId=${userId.userName}`
         );
         setRsaHistory(response.data);
       } catch (error) {
@@ -82,25 +83,27 @@ function RoadsideAssistance() {
     const user = localStorage.getItem("user");
     const userId = JSON.parse(user);
     try {
-      const response = await axios.post("http://localhost:8005/rsa/requests", {
-        vehicle_id: selectedVehicle.id,
-        user_id: userId.userName,
-        location,
-        contact_number: contactNumber,
-        assistance_type: assistanceType,
-      });
+      const response = await axios.post(
+        `${AllUrl.roadsideAssistanceUrl}/rsa/requests`,
+        {
+          vehicle_id: selectedVehicle.id,
+          user_id: userId.userName,
+          location,
+          contact_number: contactNumber,
+          assistance_type: assistanceType,
+        }
+      );
       setRsaHistory([...rsaHistory, response.data]);
       handleCloseModal();
-      
+
       // Show success message
-      setSnackbarMessage('Roadside assistance request submitted successfully!');
+      setSnackbarMessage("Roadside assistance request submitted successfully!");
       setShowSnackbar(true);
       setTimeout(() => setShowSnackbar(false), 3000);
-      
     } catch (error) {
       console.error("Error submitting service request:", error);
       // Show error message
-      setSnackbarMessage('Failed to submit request. Please try again.');
+      setSnackbarMessage("Failed to submit request. Please try again.");
       setShowSnackbar(true);
     } finally {
       setIsSubmitting(false);
@@ -109,14 +112,15 @@ function RoadsideAssistance() {
 
   if (loadingVehicles || loadingHistory) {
     return (
-      <div className="p-6 flex items-center justify-center bg-gray-700" style={{ minHeight: "calc(100vh - 64px)" }}>
+      <div
+        className="p-6 flex items-center justify-center bg-gray-700"
+        style={{ minHeight: "calc(100vh - 64px)" }}
+      >
         <div className="text-center">
-          <div className="w-48 h-48 mx-auto"> {/* Adjust size as needed */}
-            <Lottie
-              animationData={carAnimation}
-              loop={true}
-              autoplay={true}
-            />
+          <div className="w-48 h-48 mx-auto">
+            {" "}
+            {/* Adjust size as needed */}
+            <Lottie animationData={carAnimation} loop={true} autoplay={true} />
           </div>
           <p className="text-xl text-white">Loading roadside assistance...</p>
         </div>
@@ -260,7 +264,9 @@ function RoadsideAssistance() {
               </div>
 
               <div>
-                <label className="block text-gray-300 mb-2">Contact Number</label>
+                <label className="block text-gray-300 mb-2">
+                  Contact Number
+                </label>
                 <input
                   type="tel"
                   value={contactNumber}
@@ -272,7 +278,9 @@ function RoadsideAssistance() {
               </div>
 
               <div>
-                <label className="block text-gray-300 mb-2">Assistance Type</label>
+                <label className="block text-gray-300 mb-2">
+                  Assistance Type
+                </label>
                 <select
                   value={assistanceType}
                   onChange={(e) => setAssistanceType(e.target.value)}

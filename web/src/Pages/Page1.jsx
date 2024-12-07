@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import HomeLayout from "../Layouts/HomeLayout";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { AllUrl } from "../Helpers/allUrl";
 
 function Page1() {
   return (
@@ -19,7 +20,7 @@ function Dashboard() {
     testDriveVehicles: true,
     serviceHistory: true,
     roadSideAssistance: true,
-    feedbackHistory: true ,
+    feedbackHistory: true,
   });
   const [user, setUser] = useState(null);
   const [bookedVehicles, setBookedVehicles] = useState([]);
@@ -32,7 +33,7 @@ function Dashboard() {
     const user = localStorage.getItem("user");
     const userId = JSON.parse(user);
     axios
-      .get(`http://localhost:8007/customers/${userId.userName}`)
+      .get(`${AllUrl.customerServiceUrl}/customers/${userId.userName}`)
       .then((response) => {
         setUser(response.data);
         setLoading((prev) => ({ ...prev, user: false }));
@@ -41,7 +42,7 @@ function Dashboard() {
 
     // Fetch Vehicles
     axios
-      .get(`http://localhost:8003/bookings?user_name=${userId.userName}`)
+      .get(`${AllUrl.bookingServiceUrl}/bookings?user_name=${userId.userName}`)
       .then((response) => {
         setBookedVehicles(response.data);
         setLoading((prev) => ({ ...prev, vehicles: false }));
@@ -50,50 +51,52 @@ function Dashboard() {
 
     // fetch TestDrive vehiclies
     axios
-      .get(`http://localhost:8003/testdrives?user_name=${userId.userName}`)
+      .get(
+        `${AllUrl.bookingServiceUrl}/testdrives?user_name=${userId.userName}`
+      )
       .then((response) => {
         setTestDriveVehicles(response.data);
         setLoading((prev) => ({ ...prev, testDrives: false }));
       })
       .catch(() => setLoading((prev) => ({ ...prev, testDrives: false })));
-      const fetchServiceHistory = async () => {
-        try {
-          const response = await axios.get(
-            `http://localhost:8004/service/history?user_id=${userId.userName}`
-          );
-          setServiceHistory(response.data);
-        } catch (error) {
-          console.error("Error fetching service history:", error);
-        } finally {
-          setLoading((prev) => ({ ...prev, serviceHistory: false }));
-        }
-      };
-      fetchServiceHistory();
-      // fetch Road Side Assistance
-      const fetchRsaHistory = async () => {
-        try {
-          const response = await axios.get(
-            `http://localhost:8005/rsa/requests?userId=${userId.userName}`
-          );
-          setRoadSideAssistance(response.data);
-        } catch (error) {
-          console.error("Error fetching service history:", error);
-        } finally {
-          setLoading((prev) => ({ ...prev, roadSideAssistance: false }));
-        }
-      };
-      fetchRsaHistory();
-      // Fetch feedback history
+    const fetchServiceHistory = async () => {
+      try {
+        const response = await axios.get(
+          `${AllUrl.supportServiceUrl}/service/history?user_id=${userId.userName}`
+        );
+        setServiceHistory(response.data);
+      } catch (error) {
+        console.error("Error fetching service history:", error);
+      } finally {
+        setLoading((prev) => ({ ...prev, serviceHistory: false }));
+      }
+    };
+    fetchServiceHistory();
+    // fetch Road Side Assistance
+    const fetchRsaHistory = async () => {
+      try {
+        const response = await axios.get(
+          `${AllUrl.roadsideAssistanceUrl}/rsa/requests?userId=${userId.userName}`
+        );
+        setRoadSideAssistance(response.data);
+      } catch (error) {
+        console.error("Error fetching service history:", error);
+      } finally {
+        setLoading((prev) => ({ ...prev, roadSideAssistance: false }));
+      }
+    };
+    fetchRsaHistory();
+    // Fetch feedback history
     const fetchFeedbackHistory = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8006/feedback/history/${userId.userName}`
+          `${AllUrl.feedbackServiceUrl}/feedback/history/${userId.userName}`
         );
         setFeedbackHistory(response.data);
       } catch (error) {
         console.error("Error fetching feedback history:", error);
       } finally {
-        setLoading(prev => ({ ...prev, feedbackHistory: false }));
+        setLoading((prev) => ({ ...prev, feedbackHistory: false }));
       }
     };
     fetchFeedbackHistory();
@@ -106,80 +109,80 @@ function Dashboard() {
   return (
     <div className="bg-gray-700 min-h-screen p-8 text-white">
       <div className="flex justify-end space-x-4 mb-6">
-        <Link 
-          to="/catalog" 
+        <Link
+          to="/catalog"
           className="flex items-center bg-gray-800 hover:bg-gray-600 px-4 py-2 rounded-md"
         >
-          <svg 
-            className="w-5 h-5 mr-2" 
-            fill="none" 
-            stroke="currentColor" 
+          <svg
+            className="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth="2" 
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
               d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
             />
           </svg>
           Vehicles Catalog
         </Link>
 
-        <Link 
-          to="/rsa" 
+        <Link
+          to="/rsa"
           className="flex items-center bg-gray-800 hover:bg-gray-600 px-4 py-2 rounded-md"
         >
-          <svg 
-            className="w-5 h-5 mr-2" 
-            fill="none" 
-            stroke="currentColor" 
+          <svg
+            className="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth="2" 
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
               d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
             />
           </svg>
           Road Side Assistance
         </Link>
 
-        <Link 
-          to="/support" 
+        <Link
+          to="/support"
           className="flex items-center bg-gray-800 hover:bg-gray-600 px-4 py-2 rounded-md"
         >
-          <svg 
-            className="w-5 h-5 mr-2" 
-            fill="none" 
-            stroke="currentColor" 
+          <svg
+            className="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth="2" 
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
               d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
           Support
         </Link>
 
-        <Link 
-          to="/feedbackp" 
+        <Link
+          to="/feedbackp"
           className="flex items-center bg-gray-800 hover:bg-gray-600 px-4 py-2 rounded-md"
         >
-          <svg 
-            className="w-5 h-5 mr-2" 
-            fill="none" 
-            stroke="currentColor" 
+          <svg
+            className="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth="2" 
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
               d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
@@ -260,41 +263,43 @@ function Dashboard() {
         >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {serviceHistory.map((service, index) => (
-              <ServiceCard 
-                key={`${service.vehicle_id}-${service.service_date}-${index}`} 
-                service={service} 
+              <ServiceCard
+                key={`${service.vehicle_id}-${service.service_date}-${index}`}
+                service={service}
               />
             ))}
           </div>
-          </CollapsibleSection>
-          {/* Road Side Assistance Section */}
-          <CollapsibleSection
+        </CollapsibleSection>
+        {/* Road Side Assistance Section */}
+        <CollapsibleSection
           title="Road Side Assistance"
           isOpen={expandedSection === "RSA"}
           onToggle={() => toggleSection("RSA")}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {roadSideAssistance.map((rsa, index) => (
-              <RSAHistoryCard 
-                key={`${rsa.id}-${index}`} 
-                rsa={rsa} 
-              />
+              <RSAHistoryCard key={`${rsa.id}-${index}`} rsa={rsa} />
             ))}
           </div>
-          </CollapsibleSection>
-          {/* Feedback History Section */}
+        </CollapsibleSection>
+        {/* Feedback History Section */}
         <CollapsibleSection
           title="Feedback History"
           isOpen={expandedSection === "feedbackHistory"}
           onToggle={() => toggleSection("feedbackHistory")}
         >
           {loading.feedbackHistory ? (
-            <div className="text-center text-gray-400">Loading feedback history...</div>
+            <div className="text-center text-gray-400">
+              Loading feedback history...
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {feedbackHistory.length > 0 ? (
                 feedbackHistory.map((feedback) => (
-                  <FeedbackCard key={feedback.feedback_id} feedback={feedback} />
+                  <FeedbackCard
+                    key={feedback.feedback_id}
+                    feedback={feedback}
+                  />
                 ))
               ) : (
                 <p className="text-gray-400 col-span-full text-center">
@@ -344,7 +349,7 @@ function VehicleCard({ bookVehicle }) {
         className="w-full h-40 object-cover mb-4 rounded-md"
       />
       <h5 className="text-lg font-semibold">{`${vehicle.make} ${vehicle.model}`}</h5>
-      <p>Price: ${vehicle.price}</p>
+      <p>Price: ₹{vehicle.price}</p>
       <p>Year: {vehicle.year}</p>
       <p>Fuel Type: {vehicle.fuel_type}</p>
       <p>Transmission: {vehicle.transmission}</p>
@@ -412,7 +417,16 @@ function RSAHistoryCard({ rsa }) {
       <div className="mt-4 space-y-2">
         <p>Request ID: {id.slice(0, 8)}...</p>
         <p>Location: {location}</p>
-        <p>Status: <span className={`font-semibold ${status === 'Pending' ? 'text-yellow-500' : 'text-green-500'}`}>{status}</span></p>
+        <p>
+          Status:{" "}
+          <span
+            className={`font-semibold ${
+              status === "Pending" ? "text-yellow-500" : "text-green-500"
+            }`}
+          >
+            {status}
+          </span>
+        </p>
         {provider && <p>Service Provider: {provider}</p>}
       </div>
       <div className="mt-4 text-sm text-gray-400">
@@ -428,40 +442,48 @@ function RSAHistoryCard({ rsa }) {
 function FeedbackCard({ feedback }) {
   const getFeedbackTypeColor = (type) => {
     switch (type) {
-      case 'vehicle':
-        return 'text-blue-400';
-      case 'service':
-        return 'text-green-400';
-      case 'dealership':
-        return 'text-purple-400';
+      case "vehicle":
+        return "text-blue-400";
+      case "service":
+        return "text-green-400";
+      case "dealership":
+        return "text-purple-400";
       default:
-        return 'text-gray-400';
+        return "text-gray-400";
     }
   };
 
   const getRatingStars = (rating) => {
-    return '★'.repeat(rating) + '☆'.repeat(5 - rating);
+    return "★".repeat(rating) + "☆".repeat(5 - rating);
   };
 
   return (
     <div className="bg-gray-800 p-4 rounded-lg shadow-lg">
       <div className="flex justify-between items-start mb-3">
-        <h3 className={`text-lg font-semibold ${getFeedbackTypeColor(feedback.feedback_type)}`}>
-          {feedback.feedback_type.charAt(0).toUpperCase() + feedback.feedback_type.slice(1)} Feedback
+        <h3
+          className={`text-lg font-semibold ${getFeedbackTypeColor(
+            feedback.feedback_type
+          )}`}
+        >
+          {feedback.feedback_type.charAt(0).toUpperCase() +
+            feedback.feedback_type.slice(1)}{" "}
+          Feedback
         </h3>
-        <span className="text-yellow-400" title={`${feedback.rating} out of 5 stars`}>
+        <span
+          className="text-yellow-400"
+          title={`${feedback.rating} out of 5 stars`}
+        >
           {getRatingStars(feedback.rating)}
         </span>
       </div>
-      
+
       <p className="text-gray-300 mb-2">
-        <span className="text-gray-400">Reference ID:</span> {feedback.reference_id}
-        </p>
-      
-      <p className="text-gray-300 mb-3">
-        {feedback.details}
+        <span className="text-gray-400">Reference ID:</span>{" "}
+        {feedback.reference_id}
       </p>
-      
+
+      <p className="text-gray-300 mb-3">{feedback.details}</p>
+
       <p className="text-sm text-gray-400">
         Submitted: {new Date(feedback.submitted_at).toLocaleDateString()}
       </p>

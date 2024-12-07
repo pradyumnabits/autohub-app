@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import HomeLayout from "../Layouts/HomeLayout";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
+import { AllUrl } from "../Helpers/allUrl";
 
 function Page6() {
   const location = useLocation();
@@ -37,11 +38,11 @@ function CarPurchasePage({ vehicle }) {
       transaction_id: transactionId,
       transaction_date: transactionDate,
       transaction_price: Number(transactionPrice),
-      transaction_method: transactionMethod
+      transaction_method: transactionMethod,
     };
 
     axios
-      .post("http://localhost:8003/bookings", data)
+      .post(`${AllUrl.bookingServiceUrl}/bookings`, data)
       .then((response) => {
         setPurchaseStatus(response.data.message || "Purchase successful!");
         setIsPurchasing(false);
@@ -75,10 +76,12 @@ function CarPurchasePage({ vehicle }) {
       {/* Updated Purchase Section */}
       <section className="bg-gray-800 p-6 rounded-md shadow-md">
         <h4 className="text-xl font-semibold mb-4">Complete Your Purchase</h4>
-        
+
         <div className="space-y-4">
           <div>
-            <label className="block text-gray-300 mb-2">Transaction Reference ID</label>
+            <label className="block text-gray-300 mb-2">
+              Transaction Reference ID
+            </label>
             <input
               type="text"
               placeholder="Enter Transaction Reference ID"
@@ -101,7 +104,9 @@ function CarPurchasePage({ vehicle }) {
           </div>
 
           <div>
-            <label className="block text-gray-300 mb-2">Transaction Ammount (₹)</label>
+            <label className="block text-gray-300 mb-2">
+              Transaction Ammount (₹)
+            </label>
             <input
               type="number"
               value={transactionPrice}
@@ -136,7 +141,7 @@ function CarPurchasePage({ vehicle }) {
           >
             {isPurchasing ? "Processing..." : "Confirm Purchase"}
           </button>
-          
+
           {purchaseStatus && (
             <p className="text-center mt-4">{purchaseStatus}</p>
           )}

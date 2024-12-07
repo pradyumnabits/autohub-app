@@ -1,7 +1,11 @@
 from fastapi import FastAPI, HTTPException, Request
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter, SimpleSpanProcessor
+from opentelemetry.sdk.trace.export import (
+    BatchSpanProcessor,
+    ConsoleSpanExporter,
+    SimpleSpanProcessor,
+)
 from opentelemetry.exporter.jaeger.thrift import JaegerExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
@@ -15,9 +19,17 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from prometheus_client import Counter
 
 
-
-
 app = FastAPI()
+
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Base URLs of the microservices - local
 AUTH_SERVICE_URL = "http://localhost:8001"
@@ -37,14 +49,14 @@ CUSTOMER_SERVICE_URL = "http://localhost:8007"
 # CUSTOMER_FEEDBACK_URL = "http://feedback-svc"
 # CUSTOMER_SERVICE_URL = "http://customer-svc"
 
+
 # ===========================
 # OpenTelemetry and Jaeger Setup
 # ===========================
 def configure_opentelemetry():
-    resource = Resource(attributes={
-        "service.name": "gateway-service",
-        "service.version": "1.0.0"
-    })
+    resource = Resource(
+        attributes={"service.name": "gateway-service", "service.version": "1.0.0"}
+    )
 
     trace.set_tracer_provider(TracerProvider(resource=resource))
 
@@ -57,11 +69,14 @@ def configure_opentelemetry():
     trace.get_tracer_provider().add_span_processor(span_processor)
 
     console_exporter = ConsoleSpanExporter()
-    trace.get_tracer_provider().add_span_processor(SimpleSpanProcessor(console_exporter))
+    trace.get_tracer_provider().add_span_processor(
+        SimpleSpanProcessor(console_exporter)
+    )
+
 
 configure_opentelemetry()
 FastAPIInstrumentor.instrument_app(app)  # For FastAPI routes
-RequestsInstrumentor().instrument()      # For outgoing HTTP requests
+RequestsInstrumentor().instrument()  # For outgoing HTTP requests
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -73,16 +88,15 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 
 
-
-
-
 async def forward_request(service_url: str, request: Request):
     async with httpx.AsyncClient() as client:
         headers = dict(request.headers)
+        headers.pop("content-length", None)
 
         # Inject the trace context into the headers (adds traceparent for propagation)
         inject(headers)
 
+        print(request.url.path)
         # Forward the request to the downstream service
         response = await client.request(
             method=request.method,
@@ -92,6 +106,7 @@ async def forward_request(service_url: str, request: Request):
             params=request.query_params if request.method == "GET" else None,
         )
         return response.json()
+
 
 # async def forward_request(service_url: str, request: Request):
 #     try:
@@ -137,6 +152,7 @@ async def forward_request(service_url: str, request: Request):
 def ping():
     return {"msg": "pong-gateway-svc"}
 
+
 # Auth Service APIs
 from opentelemetry import trace
 from opentelemetry.propagate import inject
@@ -159,12 +175,11 @@ from fastapi import HTTPException, Request
 instrumentatorProm = Instrumentator()
 # Counter to track requests
 REQUEST_COUNT = Counter(
-    "http_requests_total", 
-    "Total number of HTTP requests", 
-    ["method", "endpoint", "http_status"]
+    "http_requests_total",
+    "Total number of HTTP requests",
+    ["method", "endpoint", "http_status"],
 )
 instrumentatorProm.instrument(app).expose(app)
-
 
 
 # Register endpoint
@@ -172,88 +187,103 @@ instrumentatorProm.instrument(app).expose(app)
 async def register_user(request: Request):
     # Start a span for tracing
     start_time = time.time()
-    
+
     try:
         # Capture the incoming request data
         request_data = await request.json()
-        
+
         # Inject trace context into the request headers (if tracing enabled)
         headers = dict(request.headers)
+        headers.pop("content-length", None)
         inject(headers)
-        
+
         # Define the URL for the authentication service
         url = f"{AUTH_SERVICE_URL}/auth/register"
         apiEndpoint = "/auth/register"
-        
+
         # Forward the request to the authentication service
         async with httpx.AsyncClient() as client:
+            # Don't send the headers with the request for now
             response = await client.post(url, json=request_data, headers=headers)
             response.raise_for_status()  # Raises an error for 4xx/5xx responses
-        
+
         # Log time taken, response status, and URL in milliseconds
         duration_ms = (time.time() - start_time) * 1000  # Convert to milliseconds
-        logger.info(f"API: {apiEndpoint}, Duration: {duration_ms:.2f}ms, Response status: {response.status_code}, Request data: {request_data}, Response: {response.json()}")
-        
+        logger.info(
+            f"API: {apiEndpoint}, Duration: {duration_ms:.2f}ms, Response status: {response.status_code}, Request data: {request_data}, Response: {response.json()}"
+        )
+
         # Track the request in Prometheus
-        REQUEST_COUNT.labels(method="POST", endpoint=apiEndpoint, http_status=response.status_code).inc()
-        
+        REQUEST_COUNT.labels(
+            method="POST", endpoint=apiEndpoint, http_status=response.status_code
+        ).inc()
+
         # Return the response from the authentication service
         return response.json()
-    
+
     except httpx.HTTPStatusError as exc:
-        logger.error(f"HTTP error during registration: {exc.response.status_code} - {exc.response.text}")
+        logger.error(
+            f"HTTP error during registration: {exc.response.status_code} - {exc.response.text}"
+        )
         raise HTTPException(status_code=exc.response.status_code, detail=str(exc))
-    
+
     except Exception as e:
         logger.error(f"Error processing registration request: {str(e)}")
         raise HTTPException(status_code=400, detail="Invalid input data")
+
 
 # Login endpoint
 @app.post("/auth/login")
 async def login_for_access_token(request: Request):
     # Start a span for tracing
     start_time = time.time()
-    
+
     try:
         # Capture the incoming request data
         request_data = await request.json()
-        
+
         # Inject trace context into the request headers (if tracing enabled)
         headers = dict(request.headers)
         inject(headers)
-        
+
         # Define the URL for the authentication service
         url = f"{AUTH_SERVICE_URL}/auth/login"
         apiEndpoint = "/auth/login"
-        
+
         # Forward the request to the authentication service
         async with httpx.AsyncClient() as client:
-            response = await client.post(url, json=request_data, headers=headers)
+            response = await client.post(url, json=request_data)  # , headers=headers)
             response.raise_for_status()  # Raises an error for 4xx/5xx responses
-        
+
         # Log time taken, response status, and URL in milliseconds
         duration_ms = (time.time() - start_time) * 1000  # Convert to milliseconds
-        logger.info(f"API: {apiEndpoint}, Duration: {duration_ms:.2f}ms, Response status: {response.status_code}, Request data: {request_data}, Response: {response.json()}")
-        
+        logger.info(
+            f"API: {apiEndpoint}, Duration: {duration_ms:.2f}ms, Response status: {response.status_code}, Request data: {request_data}, Response: {response.json()}"
+        )
+
         # Track the request in Prometheus
-        REQUEST_COUNT.labels(method="POST", endpoint=apiEndpoint, http_status=response.status_code).inc()
-        
+        REQUEST_COUNT.labels(
+            method="POST", endpoint=apiEndpoint, http_status=response.status_code
+        ).inc()
+
         # Return the response from the authentication service
         return response.json()
-    
+
     except httpx.HTTPStatusError as exc:
-        logger.error(f"HTTP error during login: {exc.response.status_code} - {exc.response.text}")
+        logger.error(
+            f"HTTP error during login: {exc.response.status_code} - {exc.response.text}"
+        )
         raise HTTPException(status_code=exc.response.status_code, detail=str(exc))
-    
+
     except Exception as e:
         logger.error(f"Error processing login request: {str(e)}")
         raise HTTPException(status_code=400, detail="Invalid input data")
+
 
 # Expose Prometheus metrics
 @app.get("/metrics")
 async def metrics():
     return await instrumentatorProm.expose()
-
 
 
 # @app.post("/auth/register")
@@ -263,16 +293,16 @@ async def metrics():
 #         try:
 #             # Capture the incoming request data
 #             request_data = await request.json()
-            
+
 #             # Inject trace context into the request headers
 #             headers = dict(request.headers)
 #             inject(headers)
-            
+
 #             # Forward the request to the authentication service
 #             async with httpx.AsyncClient() as client:
 #                 response = await client.post(f"{AUTH_SERVICE_URL}/auth/register", json=request_data, headers=headers)
 #                 response.raise_for_status()  # Raises an error for 4xx/5xx responses
-            
+
 #             # Return the response from the authentication service
 #             return response.json()
 #         except httpx.HTTPStatusError as exc:
@@ -289,16 +319,16 @@ async def metrics():
 #         try:
 #             # Capture the incoming request data
 #             request_data = await request.json()
-            
+
 #             # Inject trace context into the request headers
 #             headers = dict(request.headers)
 #             inject(headers)
-            
+
 #             # Forward the request to the authentication service
 #             async with httpx.AsyncClient() as client:
 #                 response = await client.post(f"{AUTH_SERVICE_URL}/auth/login", json=request_data, headers=headers)
 #                 response.raise_for_status()  # Raises an error for 4xx/5xx responses
-            
+
 #             # Return the response from the authentication service
 #             return response.json()
 #         except httpx.HTTPStatusError as exc:
@@ -309,26 +339,34 @@ async def metrics():
 #             raise HTTPException(status_code=400, detail="Invalid input data")
 
 
-
 # Customer Service APIs
 @app.get("/customers")
 async def get_all_customers(request: Request):
     return await forward_request(CUSTOMER_SERVICE_URL, request)
 
+
 @app.get("/customers/{customer_id}")
 async def get_customer_by_id(customer_id: str, request: Request):
-    return await forward_request(f"{CUSTOMER_SERVICE_URL}/customers/{customer_id}", request)
+
+    print(f"{CUSTOMER_SERVICE_URL}/customers/{customer_id}")
+    res = await forward_request(f"{CUSTOMER_SERVICE_URL}", request)
+
+    return res
+
 
 @app.delete("/customers/{customer_id}")
 async def delete_customer_by_id(customer_id: str, request: Request):
-    return await forward_request(f"{CUSTOMER_SERVICE_URL}/customers/{customer_id}", request)
+    return await forward_request(f"{CUSTOMER_SERVICE_URL}", request)
+
 
 @app.post("/customers")
 async def create_customer(request: Request):
     try:
         request_data = await request.json()
         async with httpx.AsyncClient() as client:
-            response = await client.post(f"{CUSTOMER_SERVICE_URL}/customers", json=request_data)
+            response = await client.post(
+                f"{CUSTOMER_SERVICE_URL}/customers", json=request_data
+            )
             response.raise_for_status()  # Raises an error for 4xx/5xx responses
         return response.json()
     except httpx.HTTPStatusError as exc:
@@ -345,11 +383,15 @@ async def create_vehicle(request: Request):
     try:
         request_data = await request.json()  # Get the request body as JSON
         async with httpx.AsyncClient() as client:
-            response = await client.post(f"{VEHICLE_SERVICE_URL}/vehicles", json=request_data)
+            response = await client.post(
+                f"{VEHICLE_SERVICE_URL}/vehicles", json=request_data
+            )
             response.raise_for_status()  # Raises an error for 4xx/5xx responses
         return response.json()  # Return the response from the vehicle service
     except httpx.HTTPStatusError as exc:
-        logging.error(f"HTTP error during vehicle creation: {exc.response.status_code} - {exc.response.text}")
+        logging.error(
+            f"HTTP error during vehicle creation: {exc.response.status_code} - {exc.response.text}"
+        )
         raise HTTPException(status_code=exc.response.status_code, detail=str(exc))
     except Exception as e:
         logging.error(f"Error processing vehicle creation request: {str(e)}")
@@ -360,9 +402,37 @@ async def create_vehicle(request: Request):
 async def get_vehicles(request: Request):
     return await forward_request(VEHICLE_SERVICE_URL, request)
 
+
 @app.get("/vehicles/{vehicle_id}")
 async def get_vehicle_by_id(vehicle_id: str, request: Request):
     return await forward_request(f"{VEHICLE_SERVICE_URL}", request)
+
+@app.post("/bookings", status_code=201)
+async def book_test_drive(request: Request):
+    try:
+        request_data = await request.json()  # Get the request body as JSON
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"{BOOKING_SERVICE_URL}", json=request_data
+            )
+            response.raise_for_status()  # Raises an error for 4xx/5xx responses
+        return response.json()  # Return the response from the post-sale service
+    except httpx.HTTPStatusError as exc:
+        logging.error(
+            f"HTTP error during service scheduling: {exc.response.status_code} - {exc.response.text}"
+        )
+        raise HTTPException(status_code=exc.response.status_code, detail=str(exc))
+    except Exception as e:
+        logging.error(f"Error processing service scheduling request: {str(e)}")
+        raise HTTPException(status_code=400, detail="Invalid input data")
+
+@app.get("/bookings")
+async def get_all_bookings(request: Request):
+    return await forward_request(BOOKING_SERVICE_URL, request)
+
+@app.get("/bookings/{booking_id}")
+async def get_vehicle_by_id(booking_id: str, request: Request):
+    return await forward_request(f"{BOOKING_SERVICE_URL}", request)
 
 # Booking Service APIs
 @app.get("/testdrives")
@@ -375,11 +445,15 @@ async def book_test_drive(request: Request):
     try:
         request_data = await request.json()  # Get the request body as JSON
         async with httpx.AsyncClient() as client:
-            response = await client.post(f"{BOOKING_SERVICE_URL}/testdrives/book", json=request_data)
+            response = await client.post(
+                f"{BOOKING_SERVICE_URL}/testdrives/book", json=request_data
+            )
             response.raise_for_status()  # Raises an error for 4xx/5xx responses
         return response.json()  # Return the response from the post-sale service
     except httpx.HTTPStatusError as exc:
-        logging.error(f"HTTP error during service scheduling: {exc.response.status_code} - {exc.response.text}")
+        logging.error(
+            f"HTTP error during service scheduling: {exc.response.status_code} - {exc.response.text}"
+        )
         raise HTTPException(status_code=exc.response.status_code, detail=str(exc))
     except Exception as e:
         logging.error(f"Error processing service scheduling request: {str(e)}")
@@ -391,7 +465,6 @@ async def get_testdrives_by_id(test_drive_id: str, request: Request):
     return await forward_request(f"{BOOKING_SERVICE_URL}", request)
 
 
-
 # Post-Sale Service APIs
 # Post-Sale Service APIs
 @app.post("/service/schedule")
@@ -399,11 +472,15 @@ async def schedule_service(request: Request):
     try:
         request_data = await request.json()  # Get the request body as JSON
         async with httpx.AsyncClient() as client:
-            response = await client.post(f"{POST_SALE_SERVICE_URL}/service/schedule", json=request_data)
+            response = await client.post(
+                f"{POST_SALE_SERVICE_URL}/service/schedule", json=request_data
+            )
             response.raise_for_status()  # Raises an error for 4xx/5xx responses
         return response.json()  # Return the response from the post-sale service
     except httpx.HTTPStatusError as exc:
-        logging.error(f"HTTP error during service scheduling: {exc.response.status_code} - {exc.response.text}")
+        logging.error(
+            f"HTTP error during service scheduling: {exc.response.status_code} - {exc.response.text}"
+        )
         raise HTTPException(status_code=exc.response.status_code, detail=str(exc))
     except Exception as e:
         logging.error(f"Error processing service scheduling request: {str(e)}")
@@ -414,25 +491,38 @@ async def schedule_service(request: Request):
 async def get_service_history(request: Request):
     return await forward_request(POST_SALE_SERVICE_URL, request)
 
+
 @app.get("/service/appointments")
 async def get_service_appointments(request: Request):
     return await forward_request(POST_SALE_SERVICE_URL, request)
+
 
 # Roadside Assistance Service APIs
 @app.post("/rsa/requests")
 async def request_roadside_assistance(request: Request):
     return await forward_request(ROADSIDE_ASSISTANCE_URL, request)
 
+
 # Roadside Assistance Service APIs
 @app.get("/rsa/requests")
 async def get_roadside_status(request: Request):
     try:
         async with httpx.AsyncClient() as client:
-            response = await client.get(f"{ROADSIDE_ASSISTANCE_URL}/rsa/requests", headers=dict(request.headers))
+            query = request.query_params
+            print(query)
+            response = await client.get(
+                f"{ROADSIDE_ASSISTANCE_URL}/rsa/requests",
+                params=query,
+                headers=dict(request.headers),
+            )
             response.raise_for_status()  # Raises an error for 4xx/5xx responses
-        return response.json()  # Return the response from the roadside assistance service
+        return (
+            response.json()
+        )  # Return the response from the roadside assistance service
     except httpx.HTTPStatusError as exc:
-        logging.error(f"HTTP error while fetching roadside assistance status: {exc.response.status_code} - {exc.response.text}")
+        logging.error(
+            f"HTTP error while fetching roadside assistance status: {exc.response.status_code} - {exc.response.text}"
+        )
         raise HTTPException(status_code=exc.response.status_code, detail=str(exc))
     except Exception as e:
         logging.error(f"Error processing roadside assistance status request: {str(e)}")
@@ -441,22 +531,30 @@ async def get_roadside_status(request: Request):
 
 @app.get("/rsa/requests/{requestId}")
 async def get_roadside_request_by_id(requestId: str, request: Request):
-    return await forward_request(f"{ROADSIDE_ASSISTANCE_URL}/rsa/requests/{requestId}", request)
+    return await forward_request(f"{ROADSIDE_ASSISTANCE_URL}", request)
+
 
 # Customer Feedback Service APIs
 @app.post("/feedback/submit")
 async def submit_feedback(request: Request):
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.post(f"{CUSTOMER_FEEDBACK_URL}/feedback/submit", headers=dict(request.headers), json=await request.json())
-            response.raise_for_status()  # Raises an error for 4xx/5xx responses
-        return response.json()  # Return the response from the customer feedback service
-    except httpx.HTTPStatusError as exc:
-        logging.error(f"HTTP error while submitting feedback: {exc.response.status_code} - {exc.response.text}")
-        raise HTTPException(status_code=exc.response.status_code, detail=str(exc))
-    except Exception as e:
-        logging.error(f"Error processing feedback submission: {str(e)}")
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+    return await forward_request(f"{CUSTOMER_FEEDBACK_URL}", request)
+    # try:
+    #     async with httpx.AsyncClient() as client:
+    #         response = await client.post(
+    #             f"{CUSTOMER_FEEDBACK_URL}/feedback/submit",
+    #             headers=dict(request.headers),
+    #             json=await request.json(),
+    #         )
+    #         response.raise_for_status()  # Raises an error for 4xx/5xx responses
+    #     return response.json()  # Return the response from the customer feedback service
+    # except httpx.HTTPStatusError as exc:
+    #     logging.error(
+    #         f"HTTP error while submitting feedback: {exc.response.status_code} - {exc.response.text}"
+    #     )
+    #     raise HTTPException(status_code=exc.response.status_code, detail=str(exc))
+    # except Exception as e:
+    #     logging.error(f"Error processing feedback submission: {str(e)}")
+    #     raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
 @app.get("/feedback/{id}")

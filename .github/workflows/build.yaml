@@ -162,17 +162,17 @@ jobs:
 
       - name: Build Docker image
         working-directory: microservices/customer-service
-        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/autohub/customer-svc:latest
+        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/autohub/customer-svc:1.0
 
       - name: Tag Docker image
-        run: docker tag ${{ secrets.DOCKER_USERNAME }}/autohub/customer-svc:latest ${{ secrets.DOCKER_USERNAME }}/customer-svc:latest
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/autohub/customer-svc:1.0 ${{ secrets.DOCKER_USERNAME }}/customer-svc:1.0
 
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/customer-svc:latest
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/customer-svc:1.0
 
       - name: Update Kubernetes manifest
         run: |
-          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/customer-svc:latest"'|' deployments/dev/customer-service.yaml
+          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/customer-svc:1.0"'|' deployments/dev/customer-service.yaml
 
           echo "# Updated at $(date)" >> deployments/dev/customer-service.yaml
 

@@ -31,8 +31,11 @@ os.makedirs(db_directory, exist_ok=True)  # Create the directory if it doesn't e
 SQLALCHEMY_DATABASE_URL = (
     f"sqlite:///{os.path.join(db_directory, 'test_drives_bookings.db')}"
 )
-CUSTOMER_SERVICE_URL = "http://localhost:8007/customers"
-VEHICEL_SERVICE_URL = "http://localhost:8002/vehicles"
+# CUSTOMER_SERVICE_URL = "http://localhost:8007/customers"
+# VEHICEL_SERVICE_URL = "http://localhost:8002/vehicles"
+
+CUSTOMER_SERVICE_URL = "http://customer-svc/customers"
+VEHICEL_SERVICE_URL = "http://vehicle-svc/vehicles"
 
 
 # Function to initialize the database

@@ -42,7 +42,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-CUSTOMER_SERVICE_URL = "http://localhost:8007/customers"
+#CUSTOMER_SERVICE_URL = "http://localhost:8007/customers"
+CUSTOMER_SERVICE_URL = "http://customer-svc/customers"
 
 # ===========================
 # Database Setup

@@ -31,7 +31,8 @@ SQLALCHEMY_DATABASE_URL = (
     f"sqlite:///{os.path.join(db_directory, 'roadside_assistance.db')}"
 )
 
-VEHICEL_SERVICE_URL = "http://localhost:8002/vehicles"
+#VEHICEL_SERVICE_URL = "http://localhost:8002/vehicles"
+VEHICEL_SERVICE_URL =  "http://vehicle-svc/vehicles"
 
 
 # Function to initialize the database

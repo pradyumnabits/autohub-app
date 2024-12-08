@@ -55,17 +55,17 @@ jobs:
 
       - name: Build Docker image
         working-directory: microservices/gateway-service
-        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/gateway-svc:2.0
+        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/gateway-svc:3.0
 
       - name: Tag Docker image
-        run: docker tag ${{ secrets.DOCKER_USERNAME }}/gateway-svc:2.0 ${{ secrets.DOCKER_USERNAME }}/gateway-svc:2.0
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/gateway-svc:3.0 ${{ secrets.DOCKER_USERNAME }}/gateway-svc:3.0
 
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/gateway-svc:2.0
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/gateway-svc:3.0
 
       - name: Update Kubernetes manifest
         run: |
-          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/gateway-svc:2.0"'|' deployments/dev/gateway-service.yaml
+          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/gateway-svc:3.0"'|' deployments/dev/gateway-service.yaml
 
           echo "# Updated at $(date)" >> deployments/dev/gateway-service.yaml
 

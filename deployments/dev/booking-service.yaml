@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: booking-svc
-        image: pradyumnakmbits/booking-svc:latest
+        image: pradyumnakmbits/booking-svc:1.0
         imagePullPolicy: Always
         ports:
         - containerPort: 8003
@@ -34,3 +34,4 @@ spec:
       nodePort: 30084   # Updated nodePort for booking-svc
   type: NodePort
 # Updated at Mon Nov 11 11:48:55 UTC 2024
+# Updated at Sun Dec  8 10:35:39 UTC 2024

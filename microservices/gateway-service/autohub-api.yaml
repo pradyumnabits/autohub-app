@@ -19,7 +19,7 @@ tags:
   - name: Roadside Assistance
     description: Endpoints for roadside assistance requests
   - name: Customer Feedback
-    description: Endpoints for submitting and retrieving customer feedback 
+    description: Endpoints for submitting and retrieving customer feedback  
 
 paths:
   /auth/register:

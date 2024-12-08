@@ -2,7 +2,7 @@ openapi: 3.0.2
 info:
   title: User Authentication API
   version: 1.0.0
-  description: API for user registration and authentication with customer service integrations 
+  description: API for user registration and authentication with customer service integrations  
 paths:
   /auth/register:
     post:

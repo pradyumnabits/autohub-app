@@ -32,22 +32,22 @@ app.add_middleware(
 )
 
 # Base URLs of the microservices - local
-AUTH_SERVICE_URL = "http://localhost:8001"
-VEHICLE_SERVICE_URL = "http://localhost:8002"
-BOOKING_SERVICE_URL = "http://localhost:8003"
-POST_SALE_SERVICE_URL = "http://localhost:8004"
-ROADSIDE_ASSISTANCE_URL = "http://localhost:8005"
-CUSTOMER_FEEDBACK_URL = "http://localhost:8006"
-CUSTOMER_SERVICE_URL = "http://localhost:8007"
+# AUTH_SERVICE_URL = "http://localhost:8001"
+# VEHICLE_SERVICE_URL = "http://localhost:8002"
+# BOOKING_SERVICE_URL = "http://localhost:8003"
+# POST_SALE_SERVICE_URL = "http://localhost:8004"
+# ROADSIDE_ASSISTANCE_URL = "http://localhost:8005"
+# CUSTOMER_FEEDBACK_URL = "http://localhost:8006"
+# CUSTOMER_SERVICE_URL = "http://localhost:8007"
 
 # Base URLs of the microservices - Kubernetes Service names
-# AUTH_SERVICE_URL = "http://auth-svc"
-# VEHICLE_SERVICE_URL = "http://vehicle-svc"
-# BOOKING_SERVICE_URL = "http://booking-svc"
-# POST_SALE_SERVICE_URL = "http://support-svc"
-# ROADSIDE_ASSISTANCE_URL = "http://rsa-svc"
-# CUSTOMER_FEEDBACK_URL = "http://feedback-svc"
-# CUSTOMER_SERVICE_URL = "http://customer-svc"
+AUTH_SERVICE_URL = "http://auth-svc"
+VEHICLE_SERVICE_URL = "http://vehicle-svc"
+BOOKING_SERVICE_URL = "http://booking-svc"
+POST_SALE_SERVICE_URL = "http://support-svc"
+ROADSIDE_ASSISTANCE_URL = "http://rsa-svc"
+CUSTOMER_FEEDBACK_URL = "http://feedback-svc"
+CUSTOMER_SERVICE_URL = "http://customer-svc"
 
 
 # ===========================

@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Post-Sale Service Support API
   version: 1.0.0
-  description: API for handling vehicle post-sale support services.
+  description: API for handling vehicle post-sale support services. 
 servers:
   - url: http://localhost:8004
 paths:

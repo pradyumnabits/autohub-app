@@ -407,36 +407,25 @@ async def get_vehicles(request: Request):
 async def get_vehicle_by_id(vehicle_id: str, request: Request):
     return await forward_request(f"{VEHICLE_SERVICE_URL}", request)
 
-@app.post("/bookings", status_code=201)
-async def book_test_drive(request: Request):
-    try:
-        request_data = await request.json()  # Get the request body as JSON
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                f"{BOOKING_SERVICE_URL}", json=request_data
-            )
-            response.raise_for_status()  # Raises an error for 4xx/5xx responses
-        return response.json()  # Return the response from the post-sale service
-    except httpx.HTTPStatusError as exc:
-        logging.error(
-            f"HTTP error during service scheduling: {exc.response.status_code} - {exc.response.text}"
-        )
-        raise HTTPException(status_code=exc.response.status_code, detail=str(exc))
-    except Exception as e:
-        logging.error(f"Error processing service scheduling request: {str(e)}")
-        raise HTTPException(status_code=400, detail="Invalid input data")
+
+# Booking Service APIs
+@app.get("/testdrives")
+async def get_test_drives(request: Request):
+    return await forward_request(BOOKING_SERVICE_URL, request)
+
 
 @app.get("/bookings")
 async def get_all_bookings(request: Request):
     return await forward_request(BOOKING_SERVICE_URL, request)
 
-@app.get("/bookings/{booking_id}")
-async def get_vehicle_by_id(booking_id: str, request: Request):
-    return await forward_request(f"{BOOKING_SERVICE_URL}", request)
 
-# Booking Service APIs
-@app.get("/testdrives")
-async def get_test_drives(request: Request):
+@app.get("/bookings/{booking_id}")
+async def get_booking_by_id(booking_id: str, request: Request):
+    return await forward_request(BOOKING_SERVICE_URL, request)
+
+
+@app.post("/bookings")
+async def create_booking(request: Request):
     return await forward_request(BOOKING_SERVICE_URL, request)
 
 
@@ -559,4 +548,9 @@ async def submit_feedback(request: Request):
 
 @app.get("/feedback/{id}")
 async def get_feedback_by_id(id: str, request: Request):
+    return await forward_request(f"{CUSTOMER_FEEDBACK_URL}", request)
+
+
+@app.get("/feedback/history/{user_id}")
+async def get_feedback_history(user_id: str, request: Request):
     return await forward_request(f"{CUSTOMER_FEEDBACK_URL}", request)

@@ -9,3 +9,14 @@ export const AllUrl = {
   roadsideAssistanceUrl: `http://${BASE_IP}:8005`,
   feedbackServiceUrl: `http://${BASE_IP}:8006`,
 };
+
+
+// export const AllUrl = {
+//   authServiceUrl: `http://${BASE_IP}:8000`,
+//   customerServiceUrl: `http://${BASE_IP}:8000`,
+//   vehicleServiceUrl: `http://${BASE_IP}:8000`,
+//   bookingServiceUrl: `http://${BASE_IP}:8000`,
+//   supportServiceUrl: `http://${BASE_IP}:8000`,
+//   roadsideAssistanceUrl: `http://${BASE_IP}:8000`,
+//   feedbackServiceUrl: `http://${BASE_IP}:8000`,
+// };

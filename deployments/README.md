@@ -37,3 +37,5 @@ kubectl port-forward --address 0.0.0.0 svc/customer-svc 8007:80 -n autohub &
 nohup ./port-forward.sh &
 
 
+http://139.84.217.135:8001/docs
+http://139.84.217.135:8001/ping

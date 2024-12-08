@@ -185,8 +185,8 @@ def schedule_service(appointment: ServiceAppointment):
 @app.get("/service/history")
 def list_service_history(user_id: str, vehicle_id: str = None):
     history = get_service_history(user_id, vehicle_id)
-    if not history:
-        raise HTTPException(status_code=404, detail="No service history found")
+    # if not history:
+    #     raise HTTPException(status_code=404, detail="No service history found")
     response = []
     for h in history:
         vehicle_details = get_vehicle_details(h[2])

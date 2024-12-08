@@ -417,17 +417,17 @@ jobs:
 
       - name: Build Docker image
         working-directory: microservices/feedback-service
-        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/autohub/feedback-svc:latest
+        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/autohub/feedback-svc:1.0
 
       - name: Tag Docker image
-        run: docker tag ${{ secrets.DOCKER_USERNAME }}/autohub/feedback-svc:latest ${{ secrets.DOCKER_USERNAME }}/feedback-svc:latest
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/autohub/feedback-svc:1.0 ${{ secrets.DOCKER_USERNAME }}/feedback-svc:1.0
 
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/feedback-svc:latest
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/feedback-svc:1.0
 
       - name: Update Kubernetes manifest
         run: |
-          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/feedback-svc:latest"'|' deployments/dev/feedback-service.yaml
+          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/feedback-svc:1.0"'|' deployments/dev/feedback-service.yaml
 
           echo "# Updated at $(date)" >> deployments/dev/feedback-service.yaml
 

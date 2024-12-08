@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: auth-svc
-        image: pradyumnakmbits/auth-svc:1.0
+        image: pradyumnakmbits/auth-svc:2.0
         imagePullPolicy: Always
         ports:
         - containerPort: 8001  # Updated to match the target port for auth-svc ms
@@ -36,3 +36,4 @@ spec:
 # Updated at Fri Nov  1 18:02:20 UTC 2024
 # Updated at Mon Nov 11 11:39:03 UTC 2024
 # Updated at Sun Dec  8 10:22:51 UTC 2024
+# Updated at Sun Dec  8 10:45:23 UTC 2024

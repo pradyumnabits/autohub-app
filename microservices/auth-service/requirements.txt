@@ -8,4 +8,12 @@ sqlalchemy
 psycopg2-binary
 PyJWT
 bcrypt
-
+httpx
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-instrumentation-fastapi
+opentelemetry-exporter-jaeger
+opentelemetry-instrumentation-requests
+loguru
+prometheus_fastapi_instrumentator
+prometheus-client

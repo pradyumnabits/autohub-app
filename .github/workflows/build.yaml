@@ -213,17 +213,17 @@ jobs:
 
       - name: Build Docker image
         working-directory: microservices/vehicle-service
-        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/autohub/vehicle-svc:latest
+        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/autohub/vehicle-svc:1.0
 
       - name: Tag Docker image
-        run: docker tag ${{ secrets.DOCKER_USERNAME }}/autohub/vehicle-svc:latest ${{ secrets.DOCKER_USERNAME }}/vehicle-svc:latest
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/autohub/vehicle-svc:1.0 ${{ secrets.DOCKER_USERNAME }}/vehicle-svc:1.0
 
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/vehicle-svc:latest
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/vehicle-svc:1.0
 
       - name: Update Kubernetes manifest
         run: |
-          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/vehicle-svc:latest"'|' deployments/dev/vehicle-service.yaml
+          sed -i 's|image: .*|image: '"${{ secrets.DOCKER_USERNAME }}/vehicle-svc:1.0"'|' deployments/dev/vehicle-service.yaml
 
           echo "# Updated at $(date)" >> deployments/dev/vehicle-service.yaml
 

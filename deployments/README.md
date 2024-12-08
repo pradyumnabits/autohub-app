@@ -39,3 +39,15 @@ nohup ./port-forward.sh &
 
 http://139.84.217.135:8001/docs
 http://139.84.217.135:8001/ping
+
+
+# GitHub
+https://github.com/pradyumnabits/autohub-app
+
+# CI Pipeline 
+https://github.com/pradyumnabits/autohub-app/actions
+
+
+
+# Docker Hub : 
+https://hub.docker.com/u/pradyumnakmbits

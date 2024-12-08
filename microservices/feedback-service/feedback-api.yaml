@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Customer Feedback Service API
   version: 1.0.0
-  description: API for collecting and managing customer feedback for vehicles and post-sale services 
+  description: API for collecting and managing customer feedback for vehicles and post-sale services  
 servers:
   - url: http://localhost:8006
 paths:

@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Vehicle Management Service API
   version: 1.0.0
-  description: API for managing vehicle listing & viewing 
+  description: API for managing vehicle listing & viewing  
 servers:
   - url: http://localhost:8002
 tags:
